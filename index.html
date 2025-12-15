@@ -8,10 +8,9 @@
     <link rel="icon" type="image/png" href="icon.png">
     <style>
         :root {
-            /* THE NEW CALMING PALETTE */
-            --bg-gradient: linear-gradient(135deg, #E0F7FA 0%, #E8F5E9 100%); /* Light Aqua to Mint */
-            --primary-color: #26A69A; /* Soothing Teal/Aqua Green */
-            --text-color: #37474F; /* Dark Blue-Grey (Softer than black) */
+            --bg-gradient: linear-gradient(135deg, #E0F7FA 0%, #E8F5E9 100%);
+            --primary-color: #26A69A;
+            --text-color: #37474F;
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: 1px solid rgba(255, 255, 255, 0.5);
         }
@@ -42,9 +41,9 @@
             background: white;
             padding: 8px 12px;
             border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(167, 219, 216, 0.3); /* Soft teal shadow */
+            box-shadow: 0 4px 10px rgba(167, 219, 216, 0.3);
             font-weight: 700;
-            color: #FF7043; /* Soft Orange for contrast */
+            color: #FF7043;
             font-size: 14px;
             display: flex;
             align-items: center;
@@ -56,33 +55,44 @@
             font-weight: 700; 
             margin: 0; 
             letter-spacing: -0.5px;
-            color: #00695C; /* Dark Teal title */
+            color: #00695C; 
             flex-grow: 1;
         }
 
-        .reset-btn-top {
+        /* Container for Top Right Buttons */
+        .top-right-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .icon-btn {
             background: transparent;
             border: none;
-            font-size: 24px;
+            font-size: 20px;
             color: #90A4AE;
             cursor: pointer;
-            padding: 0 10px;
+            padding: 0;
+            font-weight: 600; /* For text buttons like ES/EN */
+            transition: color 0.3s;
         }
+        .icon-btn:active { color: #37474F; }
+        
+        /* Specific style for language toggle */
+        #langBtn { font-size: 14px; border: 1px solid #90A4AE; padding: 4px 8px; border-radius: 10px; }
 
         p { color: #546E7A; margin-top: 5px; font-size: 14px; }
 
-        /* The Counter - Now Aqua/Blue styled */
         #counter {
             font-size: 80px;
             font-weight: 800;
-            background: -webkit-linear-gradient(#26C6DA, #00897B); /* Aqua Gradient */
+            background: -webkit-linear-gradient(#26C6DA, #00897B);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: 10px 0;
             filter: drop-shadow(0px 4px 10px rgba(38, 198, 218, 0.3));
         }
 
-        /* Input Box */
         #glimmerInput {
             width: 85%;
             padding: 16px;
@@ -99,7 +109,6 @@
         }
         #glimmerInput:focus { border-color: var(--primary-color); }
 
-        /* Main Button - The "Aqua Green" Pop */
         button.capture-btn {
             background: var(--primary-color);
             color: white;
@@ -110,7 +119,7 @@
             cursor: pointer;
             width: 95%;
             font-weight: 600;
-            box-shadow: 0 10px 20px rgba(38, 166, 154, 0.3); /* Teal colored shadow */
+            box-shadow: 0 10px 20px rgba(38, 166, 154, 0.3);
             transition: transform 0.1s;
         }
         button.capture-btn:active { transform: scale(0.96); }
@@ -120,7 +129,7 @@
             padding: 0;
             width: 100%;
             margin-top: 30px;
-            padding-bottom: 80px; /* Extra space for footer */
+            padding-bottom: 80px;
         }
 
         li {
@@ -141,18 +150,16 @@
         }
 
         .timestamp { font-size: 11px; color: #90A4AE; display: block; margin-top: 4px; }
-        
         .delete-btn { background: transparent; color: #CFD8DC; font-size: 20px; border: none; }
         .delete-btn:active { color: #EF5350; }
 
-        /* --- FOOTER & LINKS --- */
         footer {
             position: fixed;
             bottom: 20px;
             width: 100%;
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             z-index: 10;
         }
 
@@ -169,9 +176,8 @@
             cursor: pointer;
         }
 
-        /* --- MODAL (POPUP) STYLES --- */
         .modal-overlay {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
@@ -216,44 +222,109 @@
 
     <div class="top-bar">
         <div class="streak-badge">🔥 <span id="streakCount">0</span></div>
-        <h1>Glimmer</h1>
-        <button class="reset-btn-top" onclick="resetAll()">↺</button>
+        <h1 id="appTitle">Glimmer</h1>
+        <div class="top-right-controls">
+            <button id="langBtn" class="icon-btn" onclick="toggleLanguage()">ES</button>
+            <button class="icon-btn" onclick="resetAll()">↺</button>
+        </div>
     </div>
     
-    <p>Capture calm moments.</p>
+    <p id="subtitle">Capture calm moments.</p>
     
     <div id="counter">0</div>
     
     <input type="text" id="glimmerInput" placeholder="What sparked joy?">
     
-    <button class="capture-btn" onclick="addGlimmer()">✨ Capture</button>
+    <button id="captureBtn" class="capture-btn" onclick="addGlimmer()">✨ Capture</button>
 
     <ul id="glimmerList"></ul>
 
     <footer>
-        <a onclick="openModal('why')">Why?</a>
-        <a onclick="openModal('about')">About</a>
-        <a onclick="openModal('how')">How to Use</a>
+        <a id="linkWhy" onclick="openModal('why')">Why?</a>
+        <a id="linkAbout" onclick="openModal('about')">About</a>
+        <a id="linkHow" onclick="openModal('how')">How to Use</a>
     </footer>
 
     <div id="infoModal" class="modal-overlay">
         <div class="modal-card">
             <h2 id="modalTitle">Title</h2>
             <p id="modalContent">Content goes here...</p>
-            <button class="close-modal" onclick="closeModal()">Close</button>
+            <button id="closeBtn" class="close-modal" onclick="closeModal()">Close</button>
         </div>
     </div>
 
     <script>
-        // --- DATA LOADING ---
+        // --- TRANSLATION DICTIONARY ---
+        const translations = {
+            en: {
+                subtitle: "Capture calm moments.",
+                placeholder: "What sparked joy?",
+                capture: "✨ Capture",
+                resetWarning: "Reset all your Glimmers and Streak?",
+                emptyWarning: "Please type something...",
+                footer: { why: "Why?", about: "About", how: "How to Use" },
+                close: "Close",
+                modals: {
+                    why: { title: "Why Glimmer?", content: "Our brains are wired to notice danger. 'Glimmers' are the opposite: tiny moments of safety and joy. Spotting them reduces stress." },
+                    about: { title: "About", content: "Glimmer Hunter is a minimal tool designed to help you collect micro-moments of joy. Built with a focus on privacy." },
+                    how: { title: "How to Use", content: "1. Look for small happy things.<br>2. Type it in and tap Capture.<br>3. Try to find one every day to build your streak!" }
+                }
+            },
+            es: {
+                subtitle: "Captura momentos de calma.",
+                placeholder: "¿Qué te dio alegría?",
+                capture: "✨ Capturar",
+                resetWarning: "¿Reiniciar todos tus Glimmers y tu racha?",
+                emptyWarning: "Por favor escribe algo...",
+                footer: { why: "Por qué", about: "Acerca de", how: "Cómo usar" },
+                close: "Cerrar",
+                modals: {
+                    why: { title: "¿Por qué Glimmer?", content: "Nuestros cerebros están programados para notar el peligro. Los 'Glimmers' son lo opuesto: pequeños momentos de seguridad y alegría." },
+                    about: { title: "Acerca de", content: "Glimmer Hunter es una herramienta minimalista diseñada para ayudarte a coleccionar momentos de alegría. Privacidad total." },
+                    how: { title: "Cómo usar", content: "1. Busca pequeñas cosas felices.<br>2. Escríbelo y toca Capturar.<br>3. ¡Intenta encontrar una cada día para mantener tu racha!" }
+                }
+            }
+        };
+
+        // --- LOAD SETTINGS ---
         let count = parseInt(localStorage.getItem('glimmerCount')) || 0;
         let glimmerHistory = JSON.parse(localStorage.getItem('glimmerHistory')) || [];
         let streak = parseInt(localStorage.getItem('glimmerStreak')) || 0;
         let lastDate = localStorage.getItem('lastGlimmerDate'); 
+        
+        // Load Language (Default to 'en' if not set)
+        let currentLang = localStorage.getItem('glimmerLang') || 'en';
 
+        // Initialize App
         document.getElementById("counter").innerText = count;
         document.getElementById("streakCount").innerText = streak;
+        updateLanguage(currentLang); // Set text to correct language
         renderHistory();
+
+        // --- LANGUAGE FUNCTIONS ---
+        function toggleLanguage() {
+            // Switch between en and es
+            currentLang = currentLang === 'en' ? 'es' : 'en';
+            localStorage.setItem('glimmerLang', currentLang);
+            updateLanguage(currentLang);
+        }
+
+        function updateLanguage(lang) {
+            const t = translations[lang];
+            
+            // Update Buttons and Labels
+            document.getElementById("subtitle").innerText = t.subtitle;
+            document.getElementById("glimmerInput").placeholder = t.placeholder;
+            document.getElementById("captureBtn").innerText = t.capture;
+            
+            document.getElementById("linkWhy").innerText = t.footer.why;
+            document.getElementById("linkAbout").innerText = t.footer.about;
+            document.getElementById("linkHow").innerText = t.footer.how;
+            document.getElementById("closeBtn").innerText = t.close;
+
+            // Update Toggle Button Text (Show the OTHER language as the option)
+            document.getElementById("langBtn").innerText = lang === 'en' ? 'ES' : 'EN';
+        }
 
         // --- CORE FUNCTIONS ---
         function addGlimmer() {
@@ -261,8 +332,7 @@
             const text = inputField.value;
 
             if (text.trim() === "") {
-                // Subtle shake or focus instead of alert could be better, but alert is fine for now
-                alert("Please type something...");
+                alert(translations[currentLang].emptyWarning);
                 return;
             }
 
@@ -286,7 +356,7 @@
         }
 
         function resetAll() {
-            if (confirm("Reset all your Glimmers and Streak?")) {
+            if (confirm(translations[currentLang].resetWarning)) {
                 count = 0; streak = 0; glimmerHistory = []; lastDate = null;
                 saveData();
                 localStorage.removeItem('lastGlimmerDate');
@@ -304,25 +374,13 @@
             renderHistory();
         }
 
-        // --- MODAL FUNCTIONS (New!) ---
-        const modalData = {
-            why: {
-                title: "Why Glimmer?",
-                content: "Our brains are wired to notice danger (triggers). 'Glimmers' are the opposite: tiny moments of safety and joy. Training your brain to spot them reduces stress and boosts happiness."
-            },
-            about: {
-                title: "About",
-                content: "Glimmer Hunter is a minimal tool designed to help you collect micro-moments of joy. Built with a focus on privacy—your data stays on your phone."
-            },
-            how: {
-                title: "How to Use",
-                content: "1. Look for small happy things (a smell, a smile, a color).<br>2. Type it in and tap Capture.<br>3. Try to find at least one every day to build your streak!"
-            }
-        };
-
+        // --- MODAL FUNCTIONS ---
         function openModal(type) {
-            document.getElementById("modalTitle").innerText = modalData[type].title;
-            document.getElementById("modalContent").innerHTML = modalData[type].content;
+            // Get content from the current language dictionary
+            const data = translations[currentLang].modals[type];
+            
+            document.getElementById("modalTitle").innerText = data.title;
+            document.getElementById("modalContent").innerHTML = data.content;
             document.getElementById("infoModal").style.display = "flex";
         }
 
@@ -330,7 +388,6 @@
             document.getElementById("infoModal").style.display = "none";
         }
 
-        // Close modal if clicking outside the box
         document.getElementById("infoModal").addEventListener("click", function(e) {
             if (e.target === this) closeModal();
         });
