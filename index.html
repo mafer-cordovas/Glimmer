@@ -39,7 +39,7 @@
             --text-color: #E1F5FE;
             --glass-bg: rgba(20, 20, 40, 0.6);
             --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-            --primary-color: #64FFDA; /* Brighter teal for dark mode */
+            --primary-color: #64FFDA;
             --secondary-color: #FFAB91;
             --input-bg: rgba(255,255,255,0.1);
             --chip-bg: rgba(255,255,255,0.1);
@@ -53,10 +53,11 @@
             background: var(--bg-gradient);
             color: var(--text-color);
             text-align: center;
-            padding-top: max(50px, env(safe-area-inset-top)); 
+            /* Safe area padding */
+            padding-top: max(20px, env(safe-area-inset-top)); 
             padding-right: 20px;
             padding-left: 20px;
-            padding-bottom: 130px; 
+            padding-bottom: 100px; 
             margin: 0;
             min-height: 100vh;
             display: flex;
@@ -64,7 +65,20 @@
             align-items: center;
             overscroll-behavior-y: none;
             box-sizing: border-box;
-            transition: background 0.5s ease, color 0.5s ease; /* Smooth theme switch */
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        /* --- LAYOUT FIXES --- */
+        /* This container wraps the main interactive elements and centers them vertically */
+        #hero-section {
+            flex-grow: 1; /* Takes up all available space */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centers content vertically */
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+            min-height: 60vh; /* Ensures it takes up a good chunk of screen */
         }
 
         /* Top Bar */
@@ -73,7 +87,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            padding-top: 10px;
+            margin-bottom: 0;
+            flex-shrink: 0; /* Prevents top bar from squishing */
         }
 
         .streak-badge {
@@ -90,13 +106,35 @@
             backdrop-filter: blur(5px);
         }
 
-        /* Title with Sparkle */
+        .top-right-controls { display: flex; gap: 5px; align-items: center; }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            font-size: 18px; /* Slightly smaller to fit 5 icons */
+            color: var(--text-color);
+            opacity: 0.6;
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .icon-btn:active { transform: scale(1.1); opacity: 1; }
+
+        #langBtn { 
+            font-size: 11px; 
+            border: 1px solid var(--text-color); 
+            padding: 2px 5px; 
+            border-radius: 6px; 
+            font-weight: 700; 
+            opacity: 0.6;
+        }
+
+        /* Title */
         h1 { 
-            font-size: 34px; 
+            font-size: 38px; 
             font-weight: 800; 
-            margin: 0; 
-            letter-spacing: -0.5px;
-            flex-grow: 1;
+            margin: 0 0 10px 0; 
+            letter-spacing: -1px;
             background: linear-gradient(to right, var(--primary-color) 20%, #80CBC4 30%, var(--accent-gold) 40%, #FFF 50%, var(--accent-gold) 60%, #80CBC4 70%, var(--primary-color) 80%);
             background-size: 200% auto;
             color: var(--primary-color);
@@ -109,20 +147,6 @@
         }
         .sparkle-active { animation: shimmer 2s linear 1 forwards; }
 
-        .top-right-controls { display: flex; gap: 8px; align-items: center; }
-
-        .icon-btn {
-            background: transparent;
-            border: none;
-            font-size: 20px;
-            color: var(--text-color);
-            opacity: 0.6;
-            cursor: pointer;
-            padding: 4px;
-            transition: transform 0.2s, opacity 0.2s;
-        }
-        .icon-btn:active { transform: scale(1.1); opacity: 1; }
-
         #levelDisplay {
             font-size: 12px;
             text-transform: uppercase;
@@ -130,25 +154,26 @@
             color: var(--primary-color);
             font-weight: 700;
             margin-top: -5px;
-            margin-bottom: 5px;
+            margin-bottom: 20px;
             opacity: 0.8;
         }
 
         #counter {
-            font-size: 70px;
+            font-size: 80px;
             font-weight: 800;
+            line-height: 1;
             background: -webkit-linear-gradient(#4DD0E1, var(--primary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin: 0;
+            margin: 10px 0;
             filter: drop-shadow(0px 4px 10px rgba(38, 198, 218, 0.3));
         }
 
-        /* CATEGORY CHIPS */
+        /* CHIPS */
         .chip-container {
             display: flex;
             gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 20px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -156,24 +181,25 @@
             background: var(--chip-bg);
             border: var(--glass-border);
             color: var(--chip-text);
-            padding: 6px 12px;
-            border-radius: 15px;
+            padding: 8px 14px;
+            border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .chip.active {
             background: var(--chip-active);
             color: var(--chip-text-active);
             transform: scale(1.05);
             border-color: transparent;
+            box-shadow: 0 4px 10px rgba(38, 166, 154, 0.3);
         }
 
-        /* INPUT AREA */
+        /* INPUT */
         .input-container {
             width: 100%;
-            max-width: 500px;
             position: relative;
             margin-bottom: 15px;
             display: flex;
@@ -183,16 +209,16 @@
 
         #glimmerInput {
             flex-grow: 1;
-            padding: 16px;
+            padding: 18px;
             font-size: 16px;
-            border: 2px solid transparent;
-            border-radius: 20px;
+            border-radius: 25px;
             background: var(--input-bg);
             border: var(--glass-border);
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
             outline: none;
             color: var(--text-color);
             transition: border 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
             transform: translateZ(0); 
         }
         #glimmerInput::placeholder { color: var(--text-color); opacity: 0.5; }
@@ -202,25 +228,25 @@
             background: var(--input-bg);
             border: var(--glass-border);
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
+            width: 54px;
+            height: 54px;
+            font-size: 22px;
             color: var(--accent-gold); 
             cursor: pointer;
             flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
         .prompt-btn:active { transform: scale(0.9); }
 
         button.capture-btn {
             background: var(--primary-color);
-            color: white; /* Always white text on the main button */
+            color: white; 
             border: none;
             padding: 18px;
             font-size: 16px;
-            border-radius: 20px;
+            border-radius: 25px;
             cursor: pointer;
             width: 100%;
-            max-width: 500px;
             font-weight: 700;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             transition: transform 0.1s;
@@ -233,7 +259,9 @@
             padding: 0;
             width: 100%;
             max-width: 500px;
-            margin-top: 25px;
+            margin-top: 10px;
+            /* Allow list to be the only thing that pushes page height if needed */
+            flex-shrink: 0; 
         }
 
         li {
@@ -301,8 +329,7 @@
             backdrop-filter: blur(5px);
         }
         .modal-card {
-            background: var(--input-bg); /* Use input bg for consistency with theme */
-            background-color: white; /* Fallback for light mode to ensure readability */
+            background: white; 
             width: 80%;
             max-width: 400px;
             padding: 25px;
@@ -310,9 +337,8 @@
             text-align: left;
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             animation: popUp 0.3s ease;
-            color: #37474F; /* Force dark text in modal for readability against white card */
+            color: #37474F; 
         }
-        /* Dark mode specific modal fix */
         body.dark-mode .modal-card {
             background-color: #263238;
             color: #E1F5FE;
@@ -321,18 +347,17 @@
         .modal-card h2 { margin-top: 0; color: var(--primary-color); }
         .modal-card p { line-height: 1.5; }
         .close-modal {
-            background: var(--glass-bg);
-            border: 1px solid rgba(0,0,0,0.1);
-            color: inherit;
-            padding: 10px 20px;
-            border-radius: 10px;
+            background: #ECEFF1;
+            color: #333;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
             margin-top: 15px;
             width: 100%;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
         }
 
-        /* Recall Highlight Styling */
         .recall-date { font-size: 12px; opacity: 0.6; text-transform: uppercase; margin-bottom: 5px; display: block; }
         .recall-text { font-size: 22px; font-weight: 700; color: var(--primary-color); display: block; margin: 10px 0; }
 
@@ -347,37 +372,41 @@
     <div class="top-bar">
         <div class="streak-badge">🔥 <span id="streakCount">0</span></div>
         <div class="top-right-controls">
+            <button id="langBtn" class="icon-btn" onclick="toggleLanguage()">ES</button>
             <button class="icon-btn" onclick="recallGlimmer()" title="Recall Memory">🕘</button>
             <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">🌗</button>
             <button class="icon-btn" onclick="exportData()" title="Download CSV">↓</button>
+            <button class="icon-btn" onclick="resetAll()" title="Reset App">↺</button>
         </div>
     </div>
 
-    <h1 id="appTitle">Glimmer</h1>
-    <div id="counter">0</div>
-    <div id="levelDisplay">Novice</div>
-    
-    <div class="chip-container">
-        <div class="chip" onclick="selectTag('nature', this)">🌿 Nature</div>
-        <div class="chip" onclick="selectTag('people', this)">👥 People</div>
-        <div class="chip" onclick="selectTag('food', this)">🍕 Food</div>
-        <div class="chip" onclick="selectTag('cozy', this)">☕ Cozy</div>
-        <div class="chip" onclick="selectTag('win', this)">🏆 Win</div>
+    <div id="hero-section">
+        <h1 id="appTitle">Glimmer</h1>
+        <div id="counter">0</div>
+        <div id="levelDisplay">Novice</div>
+        
+        <div class="chip-container">
+            <div class="chip" onclick="selectTag('nature', this)">🌿 Nature</div>
+            <div class="chip" onclick="selectTag('people', this)">👥 People</div>
+            <div class="chip" onclick="selectTag('food', this)">🍕 Food</div>
+            <div class="chip" onclick="selectTag('cozy', this)">☕ Cozy</div>
+            <div class="chip" onclick="selectTag('win', this)">🏆 Win</div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" id="glimmerInput" placeholder="What sparked joy?">
+            <button class="prompt-btn" onclick="inspireMe()">💡</button>
+        </div>
+        
+        <button id="captureBtn" class="capture-btn" onclick="addGlimmer()">✨ Capture</button>
     </div>
-    
-    <div class="input-container">
-        <input type="text" id="glimmerInput" placeholder="What sparked joy?">
-        <button class="prompt-btn" onclick="inspireMe()">💡</button>
-    </div>
-    
-    <button id="captureBtn" class="capture-btn" onclick="addGlimmer()">✨ Capture</button>
 
     <ul id="glimmerList"></ul>
 
     <footer>
         <a id="linkWhy" onclick="openModal('why')">Why?</a>
         <a id="linkAbout" onclick="openModal('about')">About</a>
-        <a id="linkSettings" onclick="resetAll()">Reset</a>
+        <a id="linkHow" onclick="openModal('how')">How to Use</a>
     </footer>
 
     <div id="infoModal" class="modal-overlay">
@@ -395,15 +424,31 @@
                 placeholder: "What sparked joy?",
                 emptyWarning: "Please type something...",
                 resetWarning: "Reset all your Glimmers and Streak?",
+                capture: "✨ Capture",
                 levelNames: ["Novice", "Spark Hunter", "Joy Collector", "Light Bringer", "Glimmer Master"],
-                prompts: ["Did you see a nice color today?", "Did you hear a good song?", "Did you enjoy a meal?", "Did you feel cozy somewhere?", "Did someone make you smile?", "Did you see nature today?", "Did you smell something nice?"]
+                prompts: ["Did you see a nice color today?", "Did you hear a good song?", "Did you enjoy a meal?", "Did you feel cozy somewhere?", "Did someone make you smile?", "Did you see nature today?", "Did you smell something nice?"],
+                footer: { why: "Why?", about: "About", how: "How to Use" },
+                modals: {
+                    why: { title: "Why Glimmer?", content: "Our brains are wired to notice danger. 'Glimmers' are the opposite: tiny moments of safety and joy. Spotting them reduces stress and reshapes your nervous system." },
+                    about: { title: "About", content: "Glimmer Hunter is a privacy-first tool. All data stays on your device. Created to help you find the light in everyday life." },
+                    how: { title: "How to Use", content: "1. <b>Spot it:</b> Look for small happy things.<br>2. <b>Tag it:</b> Tap a category (like Nature or Cozy).<br>3. <b>Capture it:</b> Type a note and save.<br><br>💡 Tap the lightbulb for ideas!<br>🕘 Tap the clock to recall a memory." }
+                },
+                close: "Close"
             },
             es: {
                 placeholder: "¿Qué te dio alegría?",
                 emptyWarning: "Por favor escribe algo...",
                 resetWarning: "¿Reiniciar todo?",
+                capture: "✨ Capturar",
                 levelNames: ["Novato", "Cazador", "Coleccionista", "Portador de Luz", "Maestro"],
-                prompts: ["¿Viste un color bonito?", "¿Escuchaste una buena canción?", "¿Disfrutaste tu comida?", "¿Te sentiste cómodo?", "¿Alguien te hizo sonreír?", "¿Viste naturaleza?", "¿Oliste algo rico?"]
+                prompts: ["¿Viste un color bonito?", "¿Escuchaste una buena canción?", "¿Disfrutaste tu comida?", "¿Te sentiste cómodo?", "¿Alguien te hizo sonreír?", "¿Viste naturaleza?", "¿Oliste algo rico?"],
+                footer: { why: "Por qué", about: "Acerca de", how: "Cómo usar" },
+                modals: {
+                    why: { title: "¿Por qué Glimmer?", content: "Nuestros cerebros están programados para notar peligro. Los 'Glimmers' son lo opuesto: momentos de seguridad y alegría." },
+                    about: { title: "Acerca de", content: "Herramienta de privacidad total. Tus datos se quedan en tu dispositivo." },
+                    how: { title: "Cómo usar", content: "1. <b>Busca:</b> Pequeñas cosas felices.<br>2. <b>Etiqueta:</b> Toca una categoría.<br>3. <b>Captura:</b> Escribe y guarda.<br><br>💡 ¡Toca la bombilla para ideas!<br>🕘 Toca el reloj para recordar." }
+                },
+                close: "Cerrar"
             }
         };
 
@@ -415,83 +460,83 @@
             "win": "🏆"
         };
 
-        // --- STATE & STORAGE ---
+        // --- STATE ---
         let count = parseInt(localStorage.getItem('glimmerCount')) || 0;
         let glimmerHistory = JSON.parse(localStorage.getItem('glimmerHistory')) || [];
         let streak = parseInt(localStorage.getItem('glimmerStreak')) || 0;
         let lastDate = localStorage.getItem('lastGlimmerDate'); 
         let currentLang = localStorage.getItem('glimmerLang') || 'en';
         let isDarkMode = localStorage.getItem('glimmerTheme') === 'dark';
-        let currentTag = null; // Stores currently selected tag string
+        let currentTag = null; 
 
-        // --- INITIALIZATION ---
-        // Apply theme immediately
+        // --- INIT ---
         if (isDarkMode) document.body.classList.add('dark-mode');
-
         document.getElementById("counter").innerText = count;
         document.getElementById("streakCount").innerText = streak;
+        updateLanguage(currentLang); // Ensure text is set correctly on load
         updateLevelDisplay();
         renderHistory();
-        
-        // Trigger Title Animation on Load
         window.addEventListener('load', () => triggerSparkle());
 
-        // --- CORE FUNCTIONS ---
+        // --- FUNCTIONS ---
         
-        // 1. Theme Toggle
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             isDarkMode = document.body.classList.contains('dark-mode');
             localStorage.setItem('glimmerTheme', isDarkMode ? 'dark' : 'light');
         }
 
-        // 2. Tag Selection
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'es' : 'en';
+            localStorage.setItem('glimmerLang', currentLang);
+            updateLanguage(currentLang);
+        }
+
+        function updateLanguage(lang) {
+            const t = translations[lang];
+            document.getElementById("glimmerInput").placeholder = t.placeholder;
+            document.getElementById("captureBtn").innerText = t.capture;
+            document.getElementById("linkWhy").innerText = t.footer.why;
+            document.getElementById("linkAbout").innerText = t.footer.about;
+            document.getElementById("linkHow").innerText = t.footer.how;
+            document.getElementById("closeBtn").innerText = t.close;
+            document.getElementById("langBtn").innerText = lang === 'en' ? 'ES' : 'EN';
+            updateLevelDisplay();
+        }
+
         function selectTag(tag, element) {
-            // Toggle off if clicking same tag
             if (currentTag === tag) {
                 currentTag = null;
                 element.classList.remove('active');
             } else {
-                // Remove active from all others
                 document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
                 currentTag = tag;
                 element.classList.add('active');
             }
         }
 
-        // 3. Level System
         function updateLevelDisplay() {
             const levels = translations[currentLang].levelNames;
             let levelName = levels[0];
-            
             if (count >= 10) levelName = levels[1];
             if (count >= 50) levelName = levels[2];
             if (count >= 100) levelName = levels[3];
             if (count >= 500) levelName = levels[4];
-
             document.getElementById("levelDisplay").innerText = levelName;
         }
 
-        // 4. Recall Memory
         function recallGlimmer() {
             if (glimmerHistory.length === 0) {
-                alert("Capture a glimmer first!");
+                alert(currentLang === 'en' ? "Capture a glimmer first!" : "¡Captura un glimmer primero!");
                 return;
             }
             const randomItem = glimmerHistory[Math.floor(Math.random() * glimmerHistory.length)];
-            
             const dateObj = new Date(randomItem.date || new Date());
             const dateStr = dateObj.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            
             const emoji = randomItem.tag ? tagEmojis[randomItem.tag] : "✨";
-
-            const content = `
-                <span class="recall-date">${dateStr}</span>
-                <span class="recall-text">${emoji} ${randomItem.text}</span>
-                <p>A moment worth remembering.</p>
-            `;
+            const content = `<span class="recall-date">${dateStr}</span><span class="recall-text">${emoji} ${randomItem.text}</span>`;
             
-            document.getElementById("modalTitle").innerText = "Flashback";
+            document.getElementById("modalTitle").innerText = currentLang === 'en' ? "Flashback" : "Recuerdo";
             document.getElementById("modalContent").innerHTML = content;
             document.getElementById("infoModal").style.display = "flex";
         }
@@ -519,21 +564,13 @@
 
             count++;
             
-            glimmerHistory.unshift({ 
-                text: text, 
-                date: now.toISOString(),
-                tag: currentTag // Save the tag!
-            });
-
+            glimmerHistory.unshift({ text: text, date: now.toISOString(), tag: currentTag });
             saveData();
             
-            // UI Updates
             document.getElementById("counter").innerText = count;
             document.getElementById("streakCount").innerText = streak;
             updateLevelDisplay();
-            
             inputField.value = "";
-            // Reset tags
             currentTag = null;
             document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
 
@@ -592,14 +629,10 @@
         }
 
         function openModal(type) {
-            const modals = {
-                why: { title: "Why Glimmer?", content: "Our brains are wired to notice danger. 'Glimmers' are the opposite: tiny moments of safety and joy. Spotting them reduces stress and reshapes your nervous system." },
-                about: { title: "About", content: "Glimmer Hunter is a privacy-first tool. All data stays on your device. Created to help you find the light in everyday life." }
-            };
-            
-            if(modals[type]) {
-                document.getElementById("modalTitle").innerText = modals[type].title;
-                document.getElementById("modalContent").innerHTML = `<p>${modals[type].content}</p>`;
+            const data = translations[currentLang].modals[type];
+            if(data) {
+                document.getElementById("modalTitle").innerText = data.title;
+                document.getElementById("modalContent").innerHTML = `<p>${data.content}</p>`;
                 document.getElementById("infoModal").style.display = "flex";
             }
         }
@@ -631,18 +664,9 @@
                 } else {
                     displayTime = item.time || "Past";
                 }
-
-                // Show Tag Emoji if exists
                 const tagDisplay = item.tag ? `<span class="tag-icon">${tagEmojis[item.tag]}</span>` : "";
-
                 const li = document.createElement("li");
-                li.innerHTML = `
-                    <div>
-                        <strong>${tagDisplay}${item.text}</strong>
-                        <span class="timestamp">${displayTime}</span>
-                    </div>
-                    <button class="delete-btn" onclick="deleteGlimmer(${index})">×</button>
-                `;
+                li.innerHTML = `<div><strong>${tagDisplay}${item.text}</strong><span class="timestamp">${displayTime}</span></div><button class="delete-btn" onclick="deleteGlimmer(${index})">×</button>`;
                 listElement.appendChild(li);
             });
         }
