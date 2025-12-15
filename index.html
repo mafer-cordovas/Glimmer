@@ -24,26 +24,48 @@
         .top-bar {
             width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* Pushes items to Left, Center, Right */
             align-items: center;
             margin-bottom: 10px;
+            box-sizing: border-box; 
         }
 
-        /* The Streak Badge */
+        /* 1. The Streak Badge (Top Left) */
         .streak-badge {
             background: white;
-            padding: 8px 15px;
+            padding: 8px 12px;
             border-radius: 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             font-weight: 700;
-            color: #FF4500; /* Orange Red */
+            color: #FF4500;
             font-size: 14px;
             display: flex;
             align-items: center;
             gap: 5px;
+            min-width: 40px; /* Ensures it doesn't shrink too much */
         }
 
-        h1 { font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        /* 2. The Title (Center) */
+        h1 { 
+            font-size: 24px; 
+            font-weight: 700; 
+            margin: 0; 
+            letter-spacing: -0.5px;
+            flex-grow: 1; /* Takes up available space */
+        }
+
+        /* 3. The Reset Button (Top Right) */
+        .reset-btn-top {
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            color: #ccc; /* Grey so it is not distracting */
+            cursor: pointer;
+            padding: 0 10px;
+            transition: color 0.3s;
+        }
+        .reset-btn-top:active { color: #333; } /* Turns dark when tapped */
+
         p { color: #888; margin-top: 5px; font-size: 14px; }
 
         #counter {
@@ -69,7 +91,8 @@
             text-align: center;
         }
 
-        button {
+        /* Main Capture Button */
+        button.capture-btn {
             background: #222;
             color: white;
             border: none;
@@ -82,7 +105,7 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             transition: transform 0.1s;
         }
-        button:active { transform: scale(0.96); }
+        button.capture-btn:active { transform: scale(0.96); }
 
         ul {
             list-style-type: none;
@@ -111,9 +134,8 @@
             background: transparent;
             color: #ddd;
             font-size: 20px;
+            border: none;
             padding: 0 10px;
-            box-shadow: none;
-            width: auto;
             margin: 0;
         }
         .delete-btn:active { transform: scale(1.1); color: red; }
@@ -128,7 +150,10 @@
         <div class="streak-badge">
             🔥 <span id="streakCount">0</span>
         </div>
-        <h1 style="margin-right: auto; margin-left: 20px;">Glimmer</h1>
+
+        <h1>Glimmer</h1>
+
+        <button class="reset-btn-top" onclick="resetAll()">↺</button>
     </div>
     
     <p>Collect your daily joy.</p>
@@ -137,7 +162,7 @@
     
     <input type="text" id="glimmerInput" placeholder="What sparked joy?">
     
-    <button onclick="addGlimmer()">✨ Capture</button>
+    <button class="capture-btn" onclick="addGlimmer()">✨ Capture</button>
 
     <ul id="glimmerList"></ul>
 
@@ -145,10 +170,8 @@
         // --- DATA LOADING ---
         let count = parseInt(localStorage.getItem('glimmerCount')) || 0;
         let glimmerHistory = JSON.parse(localStorage.getItem('glimmerHistory')) || [];
-        
-        // Load Streak Data (New!)
         let streak = parseInt(localStorage.getItem('glimmerStreak')) || 0;
-        let lastDate = localStorage.getItem('lastGlimmerDate'); // stored as "YYYY-MM-DD"
+        let lastDate = localStorage.getItem('lastGlimmerDate'); 
 
         document.getElementById("counter").innerText = count;
         document.getElementById("streakCount").innerText = streak;
@@ -164,23 +187,19 @@
                 return;
             }
 
-            // 1. UPDATE STREAK LOGIC
-            const today = new Date().toISOString().split('T')[0]; // Get "2023-10-27" format
+            // STREAK LOGIC
+            const today = new Date().toISOString().split('T')[0];
             
-            if (lastDate === today) {
-                // Do nothing, you already added to your streak today
-            } else if (isYesterday(lastDate)) {
-                // If the last post was yesterday, increase streak!
-                streak++;
-            } else {
-                // You missed a day (or it's your first day), reset to 1
-                streak = 1;
+            if (lastDate !== today) {
+                if (isYesterday(lastDate)) {
+                    streak++;
+                } else {
+                    streak = 1;
+                }
+                lastDate = today;
             }
-            
-            // Save today as the new "lastDate"
-            lastDate = today;
 
-            // 2. UPDATE COUNT & HISTORY
+            // DATA UPDATES
             count++;
             const now = new Date();
             const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -188,11 +207,34 @@
             
             saveData();
             
-            // 3. UPDATE SCREEN
+            // UI UPDATES
             document.getElementById("counter").innerText = count;
             document.getElementById("streakCount").innerText = streak;
             inputField.value = "";
             renderHistory();
+        }
+
+        // --- NEW: RESET FUNCTION ---
+        function resetAll() {
+            // The Confirmation Warning
+            let userConfirmed = confirm("⚠️ Are you sure you want to delete all Glimmers and reset your Streak? This cannot be undone.");
+
+            if (userConfirmed) {
+                // 1. Reset Variables
+                count = 0;
+                streak = 0;
+                glimmerHistory = [];
+                lastDate = null;
+
+                // 2. Save the empty state
+                saveData();
+                localStorage.removeItem('lastGlimmerDate'); // Clear the date too
+
+                // 3. Update the screen
+                document.getElementById("counter").innerText = "0";
+                document.getElementById("streakCount").innerText = "0";
+                renderHistory();
+            }
         }
 
         function deleteGlimmer(index) {
@@ -207,9 +249,8 @@
         function saveData() {
             localStorage.setItem('glimmerCount', count);
             localStorage.setItem('glimmerHistory', JSON.stringify(glimmerHistory));
-            // Save the new streak data
             localStorage.setItem('glimmerStreak', streak);
-            localStorage.setItem('lastGlimmerDate', lastDate);
+            if(lastDate) localStorage.setItem('lastGlimmerDate', lastDate);
         }
 
         function renderHistory() {
@@ -225,9 +266,8 @@
             });
         }
 
-        // Calculates if the saved date was exactly yesterday
         function isYesterday(dateString) {
-            if (!dateString) return false; // First time user
+            if (!dateString) return false;
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
             return dateString === yesterday.toISOString().split('T')[0];
