@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#E0F7FA">
-    <title>Glimmer</title>
+    <title>Glimmer Beta</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
@@ -52,10 +52,10 @@
             background: var(--bg-gradient);
             color: var(--text-color);
             margin: 0;
-            height: 100vh; /* Fixed height for app-feel */
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prevent body scroll, handle inside list */
+            overflow: hidden; 
             transition: background 0.5s ease;
         }
 
@@ -106,7 +106,7 @@
             font-weight: 800; 
         }
 
-        /* --- HERO & INPUT SECTION (Fixed at top) --- */
+        /* --- HERO & INPUT SECTION --- */
         #hero-section {
             display: flex;
             flex-direction: column;
@@ -127,8 +127,27 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        
         .sparkle-active { animation: shimmer 2.5s linear infinite; }
+
+        /* Beta Badge Style */
+        .beta-badge {
+            font-size: 10px;
+            -webkit-text-fill-color: var(--primary-color); /* Overrides gradient */
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-left: 8px;
+            vertical-align: middle;
+            opacity: 0.8;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
 
         #counter {
             font-size: 60px;
@@ -227,7 +246,7 @@
             transition: transform 0.1s, box-shadow 0.2s;
         }
         button.capture-btn:active { transform: scale(0.98); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        body.dark-mode button.capture-btn { color: #0f172a; } /* Fix contrast in dark mode */
+        body.dark-mode button.capture-btn { color: #0f172a; }
 
         /* --- SCROLLABLE LIST AREA --- */
         #list-container {
@@ -237,7 +256,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-bottom: 80px; /* Space for footer */
+            padding-bottom: 80px;
             -webkit-overflow-scrolling: touch;
             mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black 90%, transparent 100%);
             -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black 90%, transparent 100%);
@@ -343,11 +362,14 @@
             animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             color: var(--text-color);
         }
-        /* Ensure modal is readable in dark mode */
         body.dark-mode .modal-card { background: #1e293b; }
 
         .modal-card h2 { margin-top: 0; color: var(--primary-color); }
         .modal-card p { line-height: 1.6; font-size: 14px; opacity: 0.9; }
+        
+        /* Links inside modal */
+        .modal-card a { color: var(--primary-color); text-decoration: none; font-weight: 700; }
+        
         .close-modal {
             background: var(--primary-color);
             color: var(--chip-text-active);
@@ -379,7 +401,8 @@
     </div>
 
     <div id="hero-section">
-        <h1 id="appTitle">Glimmer</h1>
+        <h1 id="appTitle">Glimmer <span class="beta-badge">Beta</span></h1>
+        
         <div id="counter">0</div>
         <div id="levelDisplay">Novice</div>
         
@@ -433,7 +456,8 @@
                 footer: { why: "Why?", about: "About", how: "How to Use" },
                 modals: {
                     why: { title: "Why Glimmer?", content: "Our brains are wired to notice danger. 'Glimmers' are the opposite: tiny moments of safety and joy. Spotting them reduces stress and reshapes your nervous system." },
-                    about: { title: "About", content: "Glimmer Hunter is a privacy-first tool. All data stays on your device (LocalStorage). Created to help you find the light in everyday life." },
+                    // ADDED INSTAGRAM LINK HERE
+                    about: { title: "About", content: "Glimmer Hunter is a privacy-first tool. All data stays on your device.<br><br>Created by <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
                     how: { title: "How to Use", content: "1. <b>Spot it:</b> Look for small happy things.<br>2. <b>Tag it:</b> Tap a category (like Nature or Cozy).<br>3. <b>Capture it:</b> Type a note and save.<br><br>💡 Tap the lightbulb for ideas!" }
                 },
                 close: "Close"
@@ -449,7 +473,8 @@
                 footer: { why: "Por qué", about: "Acerca de", how: "Cómo usar" },
                 modals: {
                     why: { title: "¿Por qué Glimmer?", content: "Nuestros cerebros están programados para notar peligro. Los 'Glimmers' son lo opuesto: momentos de seguridad y alegría." },
-                    about: { title: "Acerca de", content: "Herramienta de privacidad total. Tus datos se quedan en tu dispositivo." },
+                    // ADDED INSTAGRAM LINK HERE
+                    about: { title: "Acerca de", content: "Herramienta de privacidad total. Tus datos se quedan en tu dispositivo.<br><br>Creado por <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
                     how: { title: "Cómo usar", content: "1. <b>Busca:</b> Pequeñas cosas felices.<br>2. <b>Etiqueta:</b> Toca una categoría.<br>3. <b>Captura:</b> Escribe y guarda.<br><br>💡 ¡Toca la bombilla para ideas!" }
                 },
                 close: "Cerrar"
@@ -475,7 +500,6 @@
 
         // --- INIT ---
         if (isDarkMode) document.body.classList.add('dark-mode');
-        // Set meta theme color initially
         document.querySelector('meta[name="theme-color"]').setAttribute("content", isDarkMode ? "#0f172a" : "#E0F7FA");
 
         document.getElementById("counter").innerText = count;
@@ -498,7 +522,7 @@
             currentLang = currentLang === 'en' ? 'es' : 'en';
             localStorage.setItem('glimmerLang', currentLang);
             updateLanguage(currentLang);
-            renderHistory(); // Re-render to update empty state text
+            renderHistory();
         }
 
         function updateLanguage(lang) {
@@ -662,7 +686,6 @@
                 let displayTime;
                 if (item.date) {
                     const itemDate = new Date(item.date);
-                    // Use simple date logic for display
                     const isToday = itemDate.setHours(0,0,0,0) === today.getTime();
                     const d = new Date(item.date);
                     if (isToday) {
@@ -691,7 +714,6 @@
             if (!lastDateString) return false;
             const today = new Date();
             const checkDate = new Date(lastDateString);
-            // Reset hours to compare calendar days
             today.setHours(0,0,0,0);
             checkDate.setHours(0,0,0,0);
             
