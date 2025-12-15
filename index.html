@@ -3,148 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Glimmer Hunter</title>
+    <title>Glimmer</title>
     <style>
+        /* 1. The Background: A trendy, soft gradient */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #FAFAFA; /* Slightly warmer white */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
             color: #333;
             text-align: center;
             padding: 20px;
             margin: 0;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
         }
 
-        h1 { font-size: 24px; margin-bottom: 5px; }
-        p { color: #666; margin-top: 0; }
+        /* 2. The Header */
+        h1 { 
+            font-size: 28px; 
+            font-weight: 700; 
+            margin-bottom: 5px; 
+            letter-spacing: -0.5px;
+        }
+        
+        p { 
+            color: #888; 
+            margin-top: 0; 
+            font-size: 14px;
+        }
 
+        /* 3. The Counter: Big and bold */
         #counter {
-            font-size: 70px;
+            font-size: 80px;
             font-weight: 800;
-            color: #FFD700;
+            /* Gradient Text Effect */
+            background: -webkit-linear-gradient(#FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin: 10px 0;
-            text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1));
         }
 
-        /* The Input Box Style */
+        /* 4. The Input Box: Clean and soft */
         #glimmerInput {
-            width: 80%;
-            padding: 15px;
+            width: 85%;
+            padding: 16px;
             font-size: 16px;
-            border: 2px solid #eee;
-            border-radius: 12px;
-            margin-bottom: 10px;
+            border: none;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
             outline: none;
             text-align: center;
         }
-        
-        #glimmerInput:focus { border-color: #FFD700; }
 
+        /* 5. The Button: The "Call to Action" */
         button {
-            background-color: #222;
+            background: #222;
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 12px;
+            padding: 18px;
+            font-size: 16px;
+            border-radius: 20px;
             cursor: pointer;
-            width: 90%;
+            width: 95%;
             font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
         }
 
-        button:active { transform: scale(0.98); }
+        button:active { transform: scale(0.96); }
 
-        /* The List Style */
+        /* 6. The History List: "Glass" Cards */
         ul {
             list-style-type: none;
             padding: 0;
             width: 100%;
             margin-top: 30px;
-            text-align: left;
+            padding-bottom: 50px; /* Space at bottom for scrolling */
         }
 
         li {
-            background: white;
-            margin: 10px auto;
-            padding: 15px;
+            background: rgba(255, 255, 255, 0.8); /* Semi-transparent */
+            backdrop-filter: blur(10px); /* The "Frosted Glass" effect */
+            margin: 12px auto;
+            padding: 16px;
             width: 85%;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            font-size: 16px;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
             display: flex;
-            justify-content: space-between; /* Pushes time to the right */
-            color: #444;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            animation: fadeIn 0.5s ease;
         }
-        
+
         .timestamp {
-            font-size: 12px;
+            font-size: 11px;
             color: #aaa;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* The Delete Button (Small X) */
+        .delete-btn {
+            background: transparent;
+            color: #ddd;
+            font-size: 20px;
+            padding: 0 10px;
+            box-shadow: none;
+            width: auto;
+            margin: 0;
+        }
+        .delete-btn:active { transform: scale(1.1); color: red; }
+
+        /* Simple animation for new items */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-    <h1>Glimmer Hunter</h1>
-    <p>Capture the magic.</p>
+    <h1>Glimmer</h1>
+    <p>Collect your daily joy.</p>
     
     <div id="counter">0</div>
     
-    <input type="text" id="glimmerInput" placeholder="What did you see?">
+    <input type="text" id="glimmerInput" placeholder="What sparked joy?">
     
-    <button onclick="addGlimmer()">✨ Save Glimmer</button>
+    <button onclick="addGlimmer()">✨ Capture</button>
 
     <ul id="glimmerList"></ul>
 
     <script>
-        // 1. Load saved Data on startup
+        // --- DATA LOADING ---
         let count = parseInt(localStorage.getItem('glimmerCount')) || 0;
         let glimmerHistory = JSON.parse(localStorage.getItem('glimmerHistory')) || [];
 
         document.getElementById("counter").innerText = count;
-        renderHistory(); // Draw the list when app opens
+        renderHistory();
 
+        // --- MAIN FUNCTIONS ---
         function addGlimmer() {
             const inputField = document.getElementById("glimmerInput");
             const text = inputField.value;
 
-            // Simple check: Don't save empty glimmers
             if (text.trim() === "") {
-                alert("Please type what you saw first!");
+                alert("Type something first!");
                 return;
             }
 
-            // 1. Update Count
+            // Update Data
             count++;
-            document.getElementById("counter").innerText = count;
-            localStorage.setItem('glimmerCount', count);
-
-            // 2. Add to History List
             const now = new Date();
             const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            // Add new item to the TOP of the list (unshift)
             glimmerHistory.unshift({ text: text, time: timeString });
             
-            // Save the list to phone memory
-            localStorage.setItem('glimmerHistory', JSON.stringify(glimmerHistory));
-
-            // 3. Clear the input box and redraw the list
+            saveData();
+            
+            // Update Screen
+            document.getElementById("counter").innerText = count;
             inputField.value = "";
             renderHistory();
         }
 
+        function deleteGlimmer(index) {
+            // Remove 1 item at the specific index
+            glimmerHistory.splice(index, 1);
+            
+            // Decrease count (optional, but logical)
+            if(count > 0) count--;
+            
+            saveData();
+            
+            document.getElementById("counter").innerText = count;
+            renderHistory();
+        }
+
+        // --- HELPER FUNCTIONS ---
+        function saveData() {
+            localStorage.setItem('glimmerCount', count);
+            localStorage.setItem('glimmerHistory', JSON.stringify(glimmerHistory));
+        }
+
         function renderHistory() {
             const listElement = document.getElementById("glimmerList");
-            listElement.innerHTML = ""; // Clear current list to avoid duplicates
+            listElement.innerHTML = ""; 
 
-            // Loop through every saved glimmer and make a list item <li>
-            glimmerHistory.forEach(item => {
+            glimmerHistory.forEach((item, index) => {
                 const li = document.createElement("li");
-                li.innerHTML = `<span>${item.text}</span> <span class="timestamp">${item.time}</span>`;
+                
+                // We add a 'delete' button that calls deleteGlimmer with the item's index number
+                li.innerHTML = `
+                    <div>
+                        <strong>${item.text}</strong>
+                        <span class="timestamp">${item.time}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteGlimmer(${index})">×</button>
+                `;
                 listElement.appendChild(li);
             });
         }
