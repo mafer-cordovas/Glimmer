@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Glimmer">
-    
+    <meta name="theme-color" content="#E0F7FA">
     <title>Glimmer</title>
     
     <link rel="manifest" href="manifest.json">
@@ -18,7 +17,6 @@
     <style>
         /* --- THEMING VARIABLES --- */
         :root {
-            /* Light Mode (Default) */
             --bg-gradient: linear-gradient(135deg, #E0F7FA 0%, #E8F5E9 100%);
             --text-color: #37474F;
             --glass-bg: rgba(255, 255, 255, 0.65);
@@ -31,149 +29,131 @@
             --chip-active: #26A69A;
             --chip-text: #37474F;
             --chip-text-active: white;
+            --danger-color: #ef5350;
         }
 
-        /* Dark Mode Override */
         body.dark-mode {
-            --bg-gradient: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
-            --text-color: #E1F5FE;
-            --glass-bg: rgba(20, 20, 40, 0.6);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-            /* UPDATED: Softer, pastel teal for better eye comfort */
-            --primary-color: #80CBC4; 
-            --secondary-color: #FFAB91;
-            --input-bg: rgba(255,255,255,0.1);
-            --chip-bg: rgba(255,255,255,0.1);
-            --chip-active: #80CBC4;
-            --chip-text: #E1F5FE;
-            --chip-text-active: #000;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --text-color: #E2E8F0;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            --primary-color: #5EEAD4; 
+            --secondary-color: #FDBA74;
+            --input-bg: rgba(255,255,255,0.05);
+            --chip-bg: rgba(255,255,255,0.05);
+            --chip-active: #2DD4BF;
+            --chip-text: #E2E8F0;
+            --chip-text-active: #0f172a;
         }
 
+        /* --- GLOBAL LAYOUT --- */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background: var(--bg-gradient);
             color: var(--text-color);
-            text-align: center;
-            /* Safe area padding */
-            padding-top: max(20px, env(safe-area-inset-top)); 
-            padding-right: 20px;
-            padding-left: 20px;
-            padding-bottom: 100px; 
             margin: 0;
-            min-height: 100vh;
+            height: 100vh; /* Fixed height for app-feel */
             display: flex;
             flex-direction: column;
-            align-items: center;
-            overscroll-behavior-y: none;
-            box-sizing: border-box;
-            transition: background 0.5s ease, color 0.5s ease;
+            overflow: hidden; /* Prevent body scroll, handle inside list */
+            transition: background 0.5s ease;
         }
 
-        /* --- LAYOUT FIXES --- */
-        #hero-section {
-            flex-grow: 1; 
-            display: flex;
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center;
-            width: 100%;
-            max-width: 500px;
-            min-height: 60vh; 
-        }
-
-        /* Top Bar */
+        /* --- TOP BAR --- */
         .top-bar {
-            width: 100%;
+            padding: max(15px, env(safe-area-inset-top)) 20px 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 10px;
-            margin-bottom: 0;
-            flex-shrink: 0; 
+            flex-shrink: 0;
+            z-index: 20;
         }
 
         .streak-badge {
             background: var(--glass-bg);
             border: var(--glass-border);
-            padding: 8px 12px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-weight: 700;
             color: var(--secondary-color);
             font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             backdrop-filter: blur(5px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        .top-right-controls { display: flex; gap: 5px; align-items: center; }
+        .top-right-controls { display: flex; gap: 8px; align-items: center; }
 
         .icon-btn {
             background: transparent;
             border: none;
             font-size: 18px; 
             color: var(--text-color);
-            opacity: 0.6;
+            opacity: 0.7;
             cursor: pointer;
             padding: 5px;
-            transition: transform 0.2s, opacity 0.2s;
+            transition: transform 0.2s;
         }
-        .icon-btn:active { transform: scale(1.1); opacity: 1; }
+        .icon-btn:active { transform: scale(0.9); opacity: 1; }
 
         #langBtn { 
-            font-size: 11px; 
+            font-size: 10px; 
             border: 1px solid var(--text-color); 
-            padding: 2px 5px; 
+            padding: 2px 6px; 
             border-radius: 6px; 
-            font-weight: 700; 
-            opacity: 0.6;
+            font-weight: 800; 
         }
 
-        /* Title */
+        /* --- HERO & INPUT SECTION (Fixed at top) --- */
+        #hero-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px 15px 20px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
         h1 { 
-            font-size: 38px; 
+            font-size: 32px; 
             font-weight: 800; 
-            margin: 0 0 10px 0; 
-            letter-spacing: -1px;
-            background: linear-gradient(to right, var(--primary-color) 20%, #80CBC4 30%, var(--accent-gold) 40%, #FFF 50%, var(--accent-gold) 60%, #80CBC4 70%, var(--primary-color) 80%);
+            margin: 0; 
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-gold), var(--primary-color));
             background-size: 200% auto;
-            color: var(--primary-color);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0px 2px 10px rgba(0,0,0,0.1);
-            background-position: 0% center;
-            transition: opacity 0.3s;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.1));
         }
-        .sparkle-active { animation: shimmer 2s linear 1 forwards; }
-
-        #levelDisplay {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--primary-color);
-            font-weight: 700;
-            margin-top: -5px;
-            margin-bottom: 20px;
-            opacity: 0.8;
-        }
+        .sparkle-active { animation: shimmer 2.5s linear infinite; }
 
         #counter {
-            font-size: 80px;
+            font-size: 60px;
             font-weight: 800;
             line-height: 1;
-            background: -webkit-linear-gradient(#4DD0E1, var(--primary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 10px 0;
-            filter: drop-shadow(0px 4px 10px rgba(38, 198, 218, 0.3));
+            color: var(--text-color);
+            margin: 5px 0;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #levelDisplay {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 15px;
+            opacity: 0.9;
         }
 
         /* CHIPS */
         .chip-container {
             display: flex;
             gap: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -181,113 +161,135 @@
             background: var(--chip-bg);
             border: var(--glass-border);
             color: var(--chip-text);
-            padding: 8px 14px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .chip.active {
             background: var(--chip-active);
             color: var(--chip-text-active);
             transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(38, 166, 154, 0.4);
             border-color: transparent;
-            box-shadow: 0 4px 10px rgba(38, 166, 154, 0.3);
         }
 
-        /* INPUT */
-        .input-container {
+        /* INPUT AREA */
+        .input-wrapper {
             width: 100%;
-            position: relative;
-            margin-bottom: 15px;
+            max-width: 500px;
+        }
+
+        .input-row {
             display: flex;
-            align-items: center;
             gap: 8px;
+            margin-bottom: 10px;
         }
 
         #glimmerInput {
             flex-grow: 1;
-            padding: 18px;
+            padding: 16px;
             font-size: 16px;
-            border-radius: 25px;
+            border-radius: 20px;
             background: var(--input-bg);
             border: var(--glass-border);
             backdrop-filter: blur(10px);
             outline: none;
             color: var(--text-color);
-            transition: border 0.3s;
             box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            transform: translateZ(0); 
         }
         #glimmerInput::placeholder { color: var(--text-color); opacity: 0.5; }
-        #glimmerInput:focus { border-color: var(--primary-color); }
+        #glimmerInput:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(38, 166, 154, 0.2); }
 
         .prompt-btn {
             background: var(--input-bg);
             border: var(--glass-border);
             border-radius: 50%;
             width: 54px;
-            height: 54px;
-            font-size: 22px;
-            color: var(--accent-gold); 
+            font-size: 20px;
             cursor: pointer;
             flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-        .prompt-btn:active { transform: scale(0.9); }
 
         button.capture-btn {
             background: var(--primary-color);
             color: white; 
             border: none;
-            padding: 18px;
+            padding: 16px;
             font-size: 16px;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             width: 100%;
             font-weight: 700;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            transition: transform 0.1s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transition: transform 0.1s, box-shadow 0.2s;
         }
-        button.capture-btn:active { transform: scale(0.96); }
-        /* Specific text color fix for the button in dark mode to ensure contrast */
-        body.dark-mode button.capture-btn { color: #00332a; }
+        button.capture-btn:active { transform: scale(0.98); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        body.dark-mode button.capture-btn { color: #0f172a; } /* Fix contrast in dark mode */
 
-        /* LIST */
+        /* --- SCROLLABLE LIST AREA --- */
+        #list-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 80px; /* Space for footer */
+            -webkit-overflow-scrolling: touch;
+            mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black 90%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20px, black 90%, transparent 100%);
+        }
+
         ul {
             list-style-type: none;
             padding: 0;
-            width: 100%;
+            width: 90%;
             max-width: 500px;
             margin-top: 10px;
-            flex-shrink: 0; 
         }
 
         li {
             background: var(--glass-bg);
             border: var(--glass-border);
-            backdrop-filter: blur(12px);
-            margin: 12px auto;
+            backdrop-filter: blur(8px);
+            margin: 10px 0;
             padding: 16px;
-            width: 90%;
             border-radius: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            text-align: left;
-            animation: fadeIn 0.5s ease;
+            animation: slideIn 0.3s ease-out;
             color: var(--text-color);
         }
 
-        .timestamp { font-size: 11px; opacity: 0.6; display: block; margin-top: 4px; }
-        .tag-icon { margin-right: 6px; font-size: 14px; }
+        .glimmer-content { text-align: left; }
+        .glimmer-text { display: block; font-size: 15px; margin-bottom: 4px; line-height: 1.4; }
+        .timestamp { font-size: 11px; opacity: 0.6; }
+        .tag-icon { margin-right: 6px; }
         
-        .delete-btn { background: transparent; color: var(--text-color); opacity: 0.3; font-size: 20px; border: none; cursor: pointer; padding: 0 10px; }
-        .delete-btn:active { opacity: 1; color: #EF5350; }
+        .delete-btn { 
+            background: transparent; 
+            color: var(--text-color); 
+            opacity: 0.3; 
+            font-size: 24px; 
+            border: none; 
+            cursor: pointer; 
+            padding: 0 0 0 15px;
+            height: 100%;
+        }
+        .delete-btn:hover { color: var(--danger-color); opacity: 1; }
 
+        .empty-state {
+            margin-top: 50px;
+            opacity: 0.5;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        /* --- FOOTER --- */
         footer {
             position: fixed;
             bottom: 0;
@@ -295,61 +297,60 @@
             display: flex;
             justify-content: center;
             gap: 15px;
-            z-index: 10;
             padding-bottom: max(20px, env(safe-area-inset-bottom)); 
-            padding-top: 15px;
-            background: linear-gradient(to top, var(--glass-bg) 20%, transparent); 
-            pointer-events: none; 
+            padding-top: 20px;
+            background: linear-gradient(to top, var(--bg-gradient) 50%, transparent); 
+            z-index: 30;
+            pointer-events: none;
         }
 
         footer a {
             color: var(--text-color);
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 11px;
+            font-weight: 600;
             background: var(--glass-bg);
-            padding: 8px 15px;
+            padding: 8px 16px;
             border-radius: 20px;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             border: var(--glass-border);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             pointer-events: auto;
+            cursor: pointer;
         }
 
-        /* Modal Styles */
+        /* --- MODAL --- */
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             z-index: 100;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(4px);
         }
         .modal-card {
-            background: white; 
-            width: 80%;
-            max-width: 400px;
+            background: var(--input-bg);
+            border: var(--glass-border); 
+            width: 85%;
+            max-width: 350px;
             padding: 25px;
             border-radius: 25px;
             text-align: left;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            animation: popUp 0.3s ease;
-            color: #37474F; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: var(--text-color);
         }
-        body.dark-mode .modal-card {
-            background-color: #263238;
-            color: #E1F5FE;
-        }
+        /* Ensure modal is readable in dark mode */
+        body.dark-mode .modal-card { background: #1e293b; }
 
         .modal-card h2 { margin-top: 0; color: var(--primary-color); }
-        .modal-card p { line-height: 1.5; }
+        .modal-card p { line-height: 1.6; font-size: 14px; opacity: 0.9; }
         .close-modal {
-            background: #ECEFF1;
-            color: #333;
+            background: var(--primary-color);
+            color: var(--chip-text-active);
             border: none;
             padding: 12px;
             border-radius: 12px;
@@ -359,8 +360,8 @@
             cursor: pointer;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
 
     </style>
@@ -371,9 +372,9 @@
         <div class="streak-badge">🔥 <span id="streakCount">0</span></div>
         <div class="top-right-controls">
             <button id="langBtn" class="icon-btn" onclick="toggleLanguage()">ES</button>
-            <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">🌗</button>
-            <button class="icon-btn" onclick="exportData()" title="Download CSV">↓</button>
-            <button class="icon-btn" onclick="resetAll()" title="Reset App">↺</button>
+            <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle Theme">🌗</button>
+            <button class="icon-btn" onclick="exportData()" aria-label="Download CSV">↓</button>
+            <button class="icon-btn" onclick="resetAll()" aria-label="Reset App">↺</button>
         </div>
     </div>
 
@@ -390,15 +391,19 @@
             <div class="chip" onclick="selectTag('win', this)">🏆 Win</div>
         </div>
         
-        <div class="input-container">
-            <input type="text" id="glimmerInput" placeholder="What sparked joy?">
-            <button class="prompt-btn" onclick="inspireMe()">💡</button>
+        <div class="input-wrapper">
+            <div class="input-row">
+                <input type="text" id="glimmerInput" placeholder="What sparked joy?">
+                <button class="prompt-btn" onclick="inspireMe()">💡</button>
+            </div>
+            <button id="captureBtn" class="capture-btn" onclick="addGlimmer()">✨ Capture</button>
         </div>
-        
-        <button id="captureBtn" class="capture-btn" onclick="addGlimmer()">✨ Capture</button>
     </div>
 
-    <ul id="glimmerList"></ul>
+    <div id="list-container">
+        <ul id="glimmerList"></ul>
+        <div id="emptyState" class="empty-state" style="display:none;"></div>
+    </div>
 
     <footer>
         <a id="linkWhy" onclick="openModal('why')">Why?</a>
@@ -422,12 +427,13 @@
                 emptyWarning: "Please type something...",
                 resetWarning: "Reset all your Glimmers and Streak?",
                 capture: "✨ Capture",
+                emptyState: "No glimmers yet. Find one today!",
                 levelNames: ["Novice", "Spark Hunter", "Joy Collector", "Light Bringer", "Glimmer Master"],
                 prompts: ["Did you see a nice color today?", "Did you hear a good song?", "Did you enjoy a meal?", "Did you feel cozy somewhere?", "Did someone make you smile?", "Did you see nature today?", "Did you smell something nice?"],
                 footer: { why: "Why?", about: "About", how: "How to Use" },
                 modals: {
                     why: { title: "Why Glimmer?", content: "Our brains are wired to notice danger. 'Glimmers' are the opposite: tiny moments of safety and joy. Spotting them reduces stress and reshapes your nervous system." },
-                    about: { title: "About", content: "Glimmer Hunter is a privacy-first tool. All data stays on your device. Created to help you find the light in everyday life." },
+                    about: { title: "About", content: "Glimmer Hunter is a privacy-first tool. All data stays on your device (LocalStorage). Created to help you find the light in everyday life." },
                     how: { title: "How to Use", content: "1. <b>Spot it:</b> Look for small happy things.<br>2. <b>Tag it:</b> Tap a category (like Nature or Cozy).<br>3. <b>Capture it:</b> Type a note and save.<br><br>💡 Tap the lightbulb for ideas!" }
                 },
                 close: "Close"
@@ -437,6 +443,7 @@
                 emptyWarning: "Por favor escribe algo...",
                 resetWarning: "¿Reiniciar todo?",
                 capture: "✨ Capturar",
+                emptyState: "Aún no hay Glimmers. ¡Encuentra uno!",
                 levelNames: ["Novato", "Cazador", "Coleccionista", "Portador de Luz", "Maestro"],
                 prompts: ["¿Viste un color bonito?", "¿Escuchaste una buena canción?", "¿Disfrutaste tu comida?", "¿Te sentiste cómodo?", "¿Alguien te hizo sonreír?", "¿Viste naturaleza?", "¿Oliste algo rico?"],
                 footer: { why: "Por qué", about: "Acerca de", how: "Cómo usar" },
@@ -468,6 +475,9 @@
 
         // --- INIT ---
         if (isDarkMode) document.body.classList.add('dark-mode');
+        // Set meta theme color initially
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", isDarkMode ? "#0f172a" : "#E0F7FA");
+
         document.getElementById("counter").innerText = count;
         document.getElementById("streakCount").innerText = streak;
         updateLanguage(currentLang); 
@@ -481,12 +491,14 @@
             document.body.classList.toggle('dark-mode');
             isDarkMode = document.body.classList.contains('dark-mode');
             localStorage.setItem('glimmerTheme', isDarkMode ? 'dark' : 'light');
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", isDarkMode ? "#0f172a" : "#E0F7FA");
         }
 
         function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'es' : 'en';
             localStorage.setItem('glimmerLang', currentLang);
             updateLanguage(currentLang);
+            renderHistory(); // Re-render to update empty state text
         }
 
         function updateLanguage(lang) {
@@ -569,8 +581,9 @@
             const randomPrompt = list[Math.floor(Math.random() * list.length)];
             const input = document.getElementById("glimmerInput");
             input.placeholder = randomPrompt;
+            input.focus();
             input.style.borderColor = "var(--secondary-color)";
-            setTimeout(() => { input.style.borderColor = "transparent"; }, 500);
+            setTimeout(() => { input.style.borderColor = "var(--glass-border)"; }, 1000);
         }
 
         function exportData() {
@@ -601,12 +614,14 @@
         }
 
         function deleteGlimmer(index) {
-            glimmerHistory.splice(index, 1);
-            if(count > 0) count--;
-            saveData();
-            document.getElementById("counter").innerText = count;
-            updateLevelDisplay();
-            renderHistory();
+            if(confirm("Remove this glimmer?")) {
+                glimmerHistory.splice(index, 1);
+                if(count > 0) count--;
+                saveData();
+                document.getElementById("counter").innerText = count;
+                updateLevelDisplay();
+                renderHistory();
+            }
         }
 
         function openModal(type) {
@@ -629,7 +644,17 @@
 
         function renderHistory() {
             const listElement = document.getElementById("glimmerList");
+            const emptyState = document.getElementById("emptyState");
             listElement.innerHTML = ""; 
+
+            if (glimmerHistory.length === 0) {
+                emptyState.style.display = "block";
+                emptyState.innerText = translations[currentLang].emptyState;
+                return;
+            } else {
+                emptyState.style.display = "none";
+            }
+
             const today = new Date();
             today.setHours(0,0,0,0);
 
@@ -637,17 +662,27 @@
                 let displayTime;
                 if (item.date) {
                     const itemDate = new Date(item.date);
-                    if (itemDate.setHours(0,0,0,0) === today.getTime()) {
-                        displayTime = new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    // Use simple date logic for display
+                    const isToday = itemDate.setHours(0,0,0,0) === today.getTime();
+                    const d = new Date(item.date);
+                    if (isToday) {
+                        displayTime = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     } else {
-                        displayTime = new Date(item.date).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                        displayTime = d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + " • " + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     }
                 } else {
-                    displayTime = item.time || "Past";
+                    displayTime = item.time || "";
                 }
                 const tagDisplay = item.tag ? `<span class="tag-icon">${tagEmojis[item.tag]}</span>` : "";
+                
                 const li = document.createElement("li");
-                li.innerHTML = `<div><strong>${tagDisplay}${item.text}</strong><span class="timestamp">${displayTime}</span></div><button class="delete-btn" onclick="deleteGlimmer(${index})">×</button>`;
+                li.innerHTML = `
+                    <div class="glimmer-content">
+                        <span class="glimmer-text"><strong>${tagDisplay}</strong> ${item.text}</span>
+                        <span class="timestamp">${displayTime}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteGlimmer(${index})">×</button>
+                `;
                 listElement.appendChild(li);
             });
         }
@@ -656,11 +691,13 @@
             if (!lastDateString) return false;
             const today = new Date();
             const checkDate = new Date(lastDateString);
+            // Reset hours to compare calendar days
             today.setHours(0,0,0,0);
             checkDate.setHours(0,0,0,0);
-            const diffTime = today - checkDate;
-            const diffDays = diffTime / (1000 * 60 * 60 * 24); 
-            return diffDays === 1; 
+            
+            const diffTime = today.getTime() - checkDate.getTime();
+            const diffDays = diffTime / (1000 * 3600 * 24); 
+            return Math.round(diffDays) === 1; 
         }
     </script>
 </body>
