@@ -393,6 +393,12 @@
             font-weight: 700;
             cursor: pointer;
         }
+
+        .input-code {
+            width: 100%; padding: 10px; border-radius: 10px; 
+            border: 1px solid #ccc; font-size: 16px; margin: 10px 0;
+            background: var(--glass-bg); color: var(--text-color);
+        }
         
         /* Leaderboard Styles */
         .leaderboard-row {
@@ -424,6 +430,7 @@
     <div class="top-bar">
         <div class="streak-badge">🔥 <span id="streakCount">0</span></div>
         <div class="top-right-controls">
+            <button id="groupBtn" class="icon-btn" onclick="openGroupSettings()" title="Join Group">👥</button>
             <button id="leaderboardBtn" class="icon-btn" onclick="openLeaderboard()" title="Leaderboard">🏆</button>
             <button id="authBtn" class="icon-btn" onclick="handleAuth()" title="Login">👤</button>
             <button id="langBtn" class="icon-btn" onclick="toggleLanguage()">EN</button>
@@ -479,7 +486,7 @@
         // --- FIREBASE IMPORTS ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDocs, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDocs, collection, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // --- FIREBASE CONFIG ---
         const firebaseConfig = {
@@ -535,28 +542,75 @@
 
         window.updateCloudScore = async function() {
             if (!currentUser || !db) return;
+            const currentGroup = localStorage.getItem('glimmerGroup') || 'global';
             try {
                 await setDoc(doc(db, "users", currentUser.uid), {
                     name: currentUser.displayName,
                     score: count,
                     photo: currentUser.photoURL,
+                    groupCode: currentGroup.toLowerCase(),
                     lastUpdate: new Date()
                 }, { merge: true });
             } catch (e) { console.error("Sync error", e); }
         }
 
+        // --- GROUP FUNCTIONS ---
+        window.openGroupSettings = function() {
+            const currentGroup = localStorage.getItem('glimmerGroup') || '';
+            const html = `
+                <p>Enter a code to join a private leaderboard (e.g., 'office', 'family'). Leave blank for Global.</p>
+                <input type="text" id="groupCodeInput" class="input-code" value="${currentGroup === 'global' ? '' : currentGroup}" placeholder="e.g. TEAM-A">
+                <button class="capture-btn" onclick="saveGroupCode()">Save & Join</button>
+            `;
+            document.getElementById("modalTitle").innerText = "👥 Join Group";
+            document.getElementById("modalContent").innerHTML = html;
+            document.getElementById("infoModal").style.display = "flex";
+        }
+
+        window.saveGroupCode = function() {
+            const input = document.getElementById("groupCodeInput");
+            let code = input.value.trim().toLowerCase();
+            if (code === "") code = "global";
+            
+            localStorage.setItem('glimmerGroup', code);
+            closeModal();
+            
+            // Sync new group to cloud if logged in
+            if(currentUser) {
+                updateCloudScore();
+                alert(`Joined group: ${code.toUpperCase()}`);
+            } else {
+                alert(`Group saved locally: ${code.toUpperCase()}. Log in to appear on the leaderboard.`);
+            }
+        }
+
         window.openLeaderboard = async function() {
             if (!db) { alert("Leaderboard unavailable (Offline)"); return; }
             
-            document.getElementById("modalTitle").innerText = "🏆 Top Glimmers";
+            const groupCode = localStorage.getItem('glimmerGroup') || 'global';
+            const displayGroup = groupCode === 'global' ? 'Global' : groupCode.toUpperCase();
+            
+            document.getElementById("modalTitle").innerText = `🏆 ${displayGroup} Top 10`;
             document.getElementById("modalContent").innerHTML = "<p>Loading...</p>";
             document.getElementById("infoModal").style.display = "flex";
 
             try {
-                const q = query(collection(db, "users"), orderBy("score", "desc"), limit(10));
+                let q;
+                if (groupCode === 'global') {
+                    // Simple query does not need composite index
+                    q = query(collection(db, "users"), orderBy("score", "desc"), limit(10));
+                } else {
+                    // This query requires the INDEX we created
+                    q = query(collection(db, "users"), where("groupCode", "==", groupCode), orderBy("score", "desc"), limit(10));
+                }
+                
                 const querySnapshot = await getDocs(q);
                 let html = "<div style='display:flex; flex-direction:column; gap:5px;'>";
                 
+                if (querySnapshot.empty) {
+                    html += `<p>No players in group <b>${displayGroup}</b> yet.</p>`;
+                }
+
                 let rank = 1;
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
@@ -578,8 +632,12 @@
                 document.getElementById("modalContent").innerHTML = html;
 
             } catch (e) {
-                document.getElementById("modalContent").innerText = "Error loading ranking.";
                 console.error(e);
+                if(e.message.includes("indexes")) {
+                    document.getElementById("modalContent").innerHTML = "<p style='color:red'><b>Setup Required:</b><br>The Group Index is missing in Firebase.<br>Please check the console for the creation link.</p>";
+                } else {
+                    document.getElementById("modalContent").innerText = "Error loading ranking.";
+                }
             }
         }
 
