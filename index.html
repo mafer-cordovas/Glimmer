@@ -103,7 +103,18 @@
             justify-content: center;
         }
         .icon-btn:active { transform: scale(0.9); opacity: 1; }
-        .icon-btn img { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--primary-color); }
+        .icon-btn img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--primary-color); }
+
+        /* Login Button Styling */
+        .login-text-btn {
+            font-size: 11px;
+            border: 1px solid var(--text-color);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-weight: 700;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
 
         /* --- HERO & INPUT SECTION --- */
         #hero-section {
@@ -485,7 +496,7 @@
         <div class="streak-badge">🔥 <span id="streakCount">0</span></div>
         <div class="top-right-controls">
             <button id="leaderboardBtn" class="icon-btn" onclick="openLeaderboard()" title="Leaderboard">🏆</button>
-            <button id="authBtn" class="icon-btn" onclick="handleAuth()" title="Login">👤</button>
+            <button id="authBtn" class="icon-btn" onclick="handleAuth()" title="Login">Login</button>
             <button id="menuBtn" class="icon-btn" onclick="openSettings()" title="Menu">⚙️</button>
         </div>
     </div>
@@ -553,7 +564,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDocs, collection, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // --- FIREBASE CONFIG ---
+        // --- CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyAR_3bUYYCNm56pZNVEhXONZaCP0SNukww",
             authDomain: "glimmer-hunter.firebaseapp.com",
@@ -563,8 +574,96 @@
             appId: "1:986699142300:web:9f0e67a0dcda02aba54959"
         };
 
-        // --- INIT FIREBASE ---
+        // --- TRANSLATIONS (Moved Up for Access) ---
+        const translations = {
+            en: {
+                login: "Log in",
+                placeholder: "What sparked joy?",
+                emptyWarning: "Please type something...",
+                resetWarning: "Reset all your Glimmers and Streak?",
+                capture: "✨ Capture",
+                update: "🔄 Update",
+                emptyState: "No glimmers yet. Find one today!",
+                levelNames: ["Novice", "Spark Hunter", "Joy Collector", "Light Bringer", "Glimmer Master"],
+                tags: { nature: "🌿 Nature", people: "👥 People", food: "🍕 Food", cozy: "☕ Cozy", win: "🏆 Win" },
+                prompts: ["Did you see a nice color today?", "Did you hear a good song?", "Did you enjoy a meal?", "Did you feel cozy somewhere?", "Did someone make you smile?", "Did you see nature today?", "Did you smell something nice?"],
+                footer: { why: "Why?", about: "About", how: "How to Use" },
+                modals: {
+                    why: { title: "Why Glimmer?", content: "Our brains are wired to notice danger. 'Glimmers' are the opposite: tiny moments of safety and joy. Spotting them reduces stress and reshapes your nervous system." },
+                    about: { title: "About", content: "Glimmer Hunter is a privacy-first tool. <br><b>Notes stay on your device.</b><br>Only your score is synced to the cloud for the leaderboard.<br><br>Created by <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
+                    how: { title: "How to Use", content: "1. <b>Spot it:</b> Look for small happy things.<br>2. <b>Tag it:</b> Tap a category.<br>3. <b>Capture it:</b> Type a note and save.<br><br>🏆 <b>Compete:</b> Log in to see the global leaderboard!" }
+                },
+                levelUp: { title: "Level Up!", msg: "You have reached a new level: " },
+                close: "Close"
+            },
+            es: {
+                login: "Entrar",
+                placeholder: "¿Qué te dio alegría?",
+                emptyWarning: "Por favor escribe algo...",
+                resetWarning: "¿Reiniciar todo?",
+                capture: "✨ Capturar",
+                update: "🔄 Actualizar",
+                emptyState: "Aún no hay Glimmers. ¡Encuentra uno!",
+                levelNames: ["Novato", "Cazador", "Coleccionista", "Portador de Luz", "Maestro"],
+                tags: { nature: "🌿 Naturaleza", people: "👥 Gente", food: "🍕 Comida", cozy: "☕ Relax", win: "🏆 Logro" },
+                prompts: ["¿Viste un color bonito?", "¿Escuchaste una buena canción?", "¿Disfrutaste tu comida?", "¿Te sentiste cómodo?", "¿Alguien te hizo sonreír?", "¿Viste naturaleza?", "¿Oliste algo rico?"],
+                footer: { why: "Por qué", about: "Acerca de", how: "Cómo usar" },
+                modals: {
+                    why: { title: "¿Por qué Glimmer?", content: "Nuestros cerebros están programados para notar peligro. Los 'Glimmers' son lo opuesto: momentos de seguridad y alegría." },
+                    about: { title: "Acerca de", content: "Herramienta de privacidad. <br><b>Tus notas se quedan en tu celular.</b><br>Solo tu puntaje se sube para el ranking.<br><br>Creado por <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
+                    how: { title: "Cómo usar", content: "1. <b>Busca:</b> Pequeñas cosas felices.<br>2. <b>Etiqueta:</b> Toca una categoría.<br>3. <b>Captura:</b> Escribe y guarda.<br><br>🏆 <b>Compite:</b> ¡Inicia sesión para ver el ranking!" }
+                },
+                levelUp: { title: "¡Subiste de Nivel!", msg: "Has alcanzado un nuevo nivel: " },
+                close: "Cerrar"
+            },
+            no: {
+                login: "Logg inn",
+                placeholder: "Hva ga deg glede?",
+                emptyWarning: "Vennligst skriv noe...",
+                resetWarning: "Nullstille alle Glimmers og streak?",
+                capture: "✨ Lagre",
+                update: "🔄 Oppdater",
+                emptyState: "Ingen glimmers ennå. Finn en i dag!",
+                levelNames: ["Nybeynner", "Gnistjeger", "Gledes-samler", "Lysbringer", "Glimmer-mester"],
+                tags: { nature: "🌿 Natur", people: "👥 Folk", food: "🍕 Mat", cozy: "☕ Kos", win: "🏆 Seier" },
+                prompts: ["Så du en fin farge?", "Hørte du en bra sang?", "Smakte maten godt?", "Hadde du det koselig?", "Fikk noen deg til å smile?", "Så du noe fint i naturen?", "Luktet det godt?"],
+                footer: { why: "Hvorfor?", about: "Om", how: "Hvordan" },
+                modals: {
+                    why: { title: "Hvorfor Glimmer?", content: "Hjernen vår er laget for å oppdage fare. 'Glimmers' er det motsatte: små øyeblikk av trygghet og glede. Å legge merke til dem reduserer stress." },
+                    about: { title: "Om", content: "Personvern først. <br><b>Notatene lagres på din enhet.</b><br>Kun poengsummen sendes til skyen for rangering.<br><br>Laget av <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
+                    how: { title: "Hvordan bruke", content: "1. <b>Se det:</b> Se etter små, glade ting.<br>2. <b>Tagg det:</b> Trykk på en kategori.<br>3. <b>Lagre:</b> Skriv et notat og lagre.<br><br>🏆 <b>Konkurrer:</b> Logg inn for å se rangeringen!" }
+                },
+                levelUp: { title: "Nivå opp!", msg: "Du har nådd et nytt nivå: " },
+                close: "Lukk"
+            }
+        };
+
+        const tagEmojis = { "nature": "🌿", "people": "👥", "food": "🍕", "cozy": "☕", "win": "🏆" };
+        const supportedLangs = ['en', 'es', 'no'];
+
+        // --- STATE ---
+        let count = parseInt(localStorage.getItem('glimmerCount')) || 0;
+        let glimmerHistory = JSON.parse(localStorage.getItem('glimmerHistory')) || [];
+        let streak = parseInt(localStorage.getItem('glimmerStreak')) || 0;
+        let lastDate = localStorage.getItem('lastGlimmerDate'); 
+        let currentLang = localStorage.getItem('glimmerLang') || 'en';
+        let isDarkMode = localStorage.getItem('glimmerTheme') === 'dark';
+        let currentTag = null; 
+        let editIndex = -1;
+
+        // --- INIT ---
+        if (isDarkMode) document.body.classList.add('dark-mode');
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", isDarkMode ? "#0f172a" : "#E0F7FA");
+
+        document.getElementById("counter").innerText = count;
+        document.getElementById("streakCount").innerText = streak;
+        
+        if(!translations[currentLang]) currentLang = 'en';
+        // Language update happens in window load below to ensure auth state is checked
+        
         let app, auth, db, currentUser;
+
+        // --- INIT FIREBASE ---
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
@@ -578,6 +677,11 @@
         } catch (e) {
             console.error("Firebase Init Error:", e);
         }
+
+        updateLanguage(currentLang); 
+        updateLevelDisplay();
+        renderHistory();
+        window.addEventListener('load', () => triggerSparkle());
 
         // --- AUTH FUNCTIONS ---
         window.handleAuth = async function() {
@@ -601,7 +705,9 @@
             if (currentUser) {
                 btn.innerHTML = `<img src="${currentUser.photoURL}" alt="User">`;
             } else {
-                btn.innerHTML = `👤`;
+                // Show Text Button
+                const text = translations[currentLang]?.login || "Log in";
+                btn.innerHTML = `<span class="login-text-btn">${text}</span>`;
             }
         }
 
@@ -770,23 +876,17 @@
             reader.onload = function(e) {
                 const text = e.target.result;
                 const lines = text.split('\n');
-                
-                // Skip header "Date,Tag,Glimmer"
                 let addedCount = 0;
                 
-                // Simple CSV parser
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (line) {
-                        // Regex to handle CSV quotes
                         const parts = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
                         if(parts && parts.length >= 3) {
-                            // Strip quotes
                             const dateStr = parts[0].replace(/^"|"$/g, '');
                             const tagStr = parts[1].replace(/^"|"$/g, '');
                             const msgStr = parts[2].replace(/^"|"$/g, '');
                             
-                            // Reconstruct object
                             const d = new Date(dateStr);
                             glimmerHistory.push({
                                 text: msgStr,
@@ -798,16 +898,14 @@
                     }
                 }
                 
-                // Re-sort history by date
                 glimmerHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
-                
                 count += addedCount;
                 saveData();
                 renderHistory();
                 updateLevelDisplay();
                 alert(`Successfully restored ${addedCount} glimmers!`);
                 closeModal();
-                input.value = ''; // Reset
+                input.value = ''; 
             };
             reader.readAsText(file);
         }
@@ -836,15 +934,12 @@
             const card = document.getElementById("shareCard");
             const tagText = translations[currentLang].tags[item.tag] || "✨ Glimmer";
             
-            // Populate invisible card
             document.getElementById("shareTag").innerText = tagText;
             document.getElementById("shareText").innerText = item.text;
             document.getElementById("shareDate").innerText = new Date().toLocaleDateString();
             
-            // Set Theme
             if (isDarkMode) card.classList.add('dark'); else card.classList.remove('dark');
 
-            // Generate Image
             html2canvas(card).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'my-glimmer.png';
@@ -853,94 +948,6 @@
             });
         }
 
-        // --- STANDARD APP LOGIC ---
-
-        const translations = {
-            en: {
-                placeholder: "What sparked joy?",
-                emptyWarning: "Please type something...",
-                resetWarning: "Reset all your Glimmers and Streak?",
-                capture: "✨ Capture",
-                update: "🔄 Update",
-                emptyState: "No glimmers yet. Find one today!",
-                levelNames: ["Novice", "Spark Hunter", "Joy Collector", "Light Bringer", "Glimmer Master"],
-                tags: { nature: "🌿 Nature", people: "👥 People", food: "🍕 Food", cozy: "☕ Cozy", win: "🏆 Win" },
-                prompts: ["Did you see a nice color today?", "Did you hear a good song?", "Did you enjoy a meal?", "Did you feel cozy somewhere?", "Did someone make you smile?", "Did you see nature today?", "Did you smell something nice?"],
-                footer: { why: "Why?", about: "About", how: "How to Use" },
-                modals: {
-                    why: { title: "Why Glimmer?", content: "Our brains are wired to notice danger. 'Glimmers' are the opposite: tiny moments of safety and joy. Spotting them reduces stress and reshapes your nervous system." },
-                    about: { title: "About", content: "Glimmer Hunter is a privacy-first tool. <br><b>Notes stay on your device.</b><br>Only your score is synced to the cloud for the leaderboard.<br><br>Created by <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
-                    how: { title: "How to Use", content: "1. <b>Spot it:</b> Look for small happy things.<br>2. <b>Tag it:</b> Tap a category.<br>3. <b>Capture it:</b> Type a note and save.<br><br>🏆 <b>Compete:</b> Log in to see the global leaderboard!" }
-                },
-                levelUp: { title: "Level Up!", msg: "You have reached a new level: " },
-                close: "Close"
-            },
-            es: {
-                placeholder: "¿Qué te dio alegría?",
-                emptyWarning: "Por favor escribe algo...",
-                resetWarning: "¿Reiniciar todo?",
-                capture: "✨ Capturar",
-                update: "🔄 Actualizar",
-                emptyState: "Aún no hay Glimmers. ¡Encuentra uno!",
-                levelNames: ["Novato", "Cazador", "Coleccionista", "Portador de Luz", "Maestro"],
-                tags: { nature: "🌿 Naturaleza", people: "👥 Gente", food: "🍕 Comida", cozy: "☕ Relax", win: "🏆 Logro" },
-                prompts: ["¿Viste un color bonito?", "¿Escuchaste una buena canción?", "¿Disfrutaste tu comida?", "¿Te sentiste cómodo?", "¿Alguien te hizo sonreír?", "¿Viste naturaleza?", "¿Oliste algo rico?"],
-                footer: { why: "Por qué", about: "Acerca de", how: "Cómo usar" },
-                modals: {
-                    why: { title: "¿Por qué Glimmer?", content: "Nuestros cerebros están programados para notar peligro. Los 'Glimmers' son lo opuesto: momentos de seguridad y alegría." },
-                    about: { title: "Acerca de", content: "Herramienta de privacidad. <br><b>Tus notas se quedan en tu celular.</b><br>Solo tu puntaje se sube para el ranking.<br><br>Creado por <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
-                    how: { title: "Cómo usar", content: "1. <b>Busca:</b> Pequeñas cosas felices.<br>2. <b>Etiqueta:</b> Toca una categoría.<br>3. <b>Captura:</b> Escribe y guarda.<br><br>🏆 <b>Compite:</b> ¡Inicia sesión para ver el ranking!" }
-                },
-                levelUp: { title: "¡Subiste de Nivel!", msg: "Has alcanzado un nuevo nivel: " },
-                close: "Cerrar"
-            },
-            no: {
-                placeholder: "Hva ga deg glede?",
-                emptyWarning: "Vennligst skriv noe...",
-                resetWarning: "Nullstille alle Glimmers og streak?",
-                capture: "✨ Lagre",
-                update: "🔄 Oppdater",
-                emptyState: "Ingen glimmers ennå. Finn en i dag!",
-                levelNames: ["Nybeynner", "Gnistjeger", "Gledes-samler", "Lysbringer", "Glimmer-mester"],
-                tags: { nature: "🌿 Natur", people: "👥 Folk", food: "🍕 Mat", cozy: "☕ Kos", win: "🏆 Seier" },
-                prompts: ["Så du en fin farge?", "Hørte du en bra sang?", "Smakte maten godt?", "Hadde du det koselig?", "Fikk noen deg til å smile?", "Så du noe fint i naturen?", "Luktet det godt?"],
-                footer: { why: "Hvorfor?", about: "Om", how: "Hvordan" },
-                modals: {
-                    why: { title: "Hvorfor Glimmer?", content: "Hjernen vår er laget for å oppdage fare. 'Glimmers' er det motsatte: små øyeblikk av trygghet og glede. Å legge merke til dem reduserer stress." },
-                    about: { title: "Om", content: "Personvern først. <br><b>Notatene lagres på din enhet.</b><br>Kun poengsummen sendes til skyen for rangering.<br><br>Laget av <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
-                    how: { title: "Hvordan bruke", content: "1. <b>Se det:</b> Se etter små, glade ting.<br>2. <b>Tagg det:</b> Trykk på en kategori.<br>3. <b>Lagre:</b> Skriv et notat og lagre.<br><br>🏆 <b>Konkurrer:</b> Logg inn for å se rangeringen!" }
-                },
-                levelUp: { title: "Nivå opp!", msg: "Du har nådd et nytt nivå: " },
-                close: "Lukk"
-            }
-        };
-
-        const tagEmojis = { "nature": "🌿", "people": "👥", "food": "🍕", "cozy": "☕", "win": "🏆" };
-        const supportedLangs = ['en', 'es', 'no'];
-
-        // --- STATE ---
-        let count = parseInt(localStorage.getItem('glimmerCount')) || 0;
-        let glimmerHistory = JSON.parse(localStorage.getItem('glimmerHistory')) || [];
-        let streak = parseInt(localStorage.getItem('glimmerStreak')) || 0;
-        let lastDate = localStorage.getItem('lastGlimmerDate'); 
-        let currentLang = localStorage.getItem('glimmerLang') || 'en';
-        let isDarkMode = localStorage.getItem('glimmerTheme') === 'dark';
-        let currentTag = null; 
-        let editIndex = -1;
-
-        // --- INIT ---
-        if (isDarkMode) document.body.classList.add('dark-mode');
-        document.querySelector('meta[name="theme-color"]').setAttribute("content", isDarkMode ? "#0f172a" : "#E0F7FA");
-
-        document.getElementById("counter").innerText = count;
-        document.getElementById("streakCount").innerText = streak;
-        
-        if(!translations[currentLang]) currentLang = 'en';
-        updateLanguage(currentLang); 
-        updateLevelDisplay();
-        renderHistory();
-        window.addEventListener('load', () => triggerSparkle());
-
         // --- FUNCTIONS (Attached to Window) ---
         
         window.toggleTheme = function() {
@@ -948,7 +955,7 @@
             isDarkMode = document.body.classList.contains('dark-mode');
             localStorage.setItem('glimmerTheme', isDarkMode ? 'dark' : 'light');
             document.querySelector('meta[name="theme-color"]').setAttribute("content", isDarkMode ? "#0f172a" : "#E0F7FA");
-            openSettings(); // Refresh menu UI if open
+            openSettings(); 
         }
 
         window.toggleLanguage = function() {
@@ -957,7 +964,7 @@
             localStorage.setItem('glimmerLang', currentLang);
             updateLanguage(currentLang);
             renderHistory();
-            openSettings(); // Refresh menu UI
+            openSettings(); 
         }
 
         function updateLanguage(lang) {
@@ -977,6 +984,10 @@
                 const key = chip.getAttribute('data-tag');
                 if(tags[key]) { chip.innerText = tags[key]; }
             });
+
+            // Update Auth Button Text if Logged Out
+            updateAuthUI();
+
             updateLevelDisplay();
         }
 
@@ -1018,7 +1029,6 @@
             if (text.trim() === "") { alert(translations[currentLang].emptyWarning); return; }
 
             if (editIndex > -1) {
-                // UPDATE MODE
                 glimmerHistory[editIndex].text = text;
                 glimmerHistory[editIndex].tag = currentTag;
                 
@@ -1035,7 +1045,6 @@
                 return;
             }
 
-            // CREATE MODE
             const prevLevel = getLevelName(count);
             const now = new Date();
             const todayStr = now.toISOString().split('T')[0];
@@ -1050,7 +1059,7 @@
             
             glimmerHistory.unshift({ text: text, date: now.toISOString(), tag: currentTag });
             saveData();
-            updateCloudScore(); // SYNC TO CLOUD
+            updateCloudScore(); 
             
             document.getElementById("counter").innerText = count;
             document.getElementById("streakCount").innerText = streak;
@@ -1124,7 +1133,7 @@
             if (confirm(translations[currentLang].resetWarning)) {
                 count = 0; streak = 0; glimmerHistory = []; lastDate = null;
                 saveData();
-                updateCloudScore(); // Reset cloud score too
+                updateCloudScore(); 
                 localStorage.removeItem('lastGlimmerDate');
                 location.reload(); 
             }
