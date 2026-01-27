@@ -30,6 +30,7 @@
             --chip-text: #37474F;
             --chip-text-active: white;
             --danger-color: #ef5350;
+            --edit-color: #42A5F5;
         }
 
         body.dark-mode {
@@ -249,6 +250,11 @@
         button.capture-btn:active { transform: scale(0.98); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         body.dark-mode button.capture-btn { color: #0f172a; }
 
+        /* Update State for Button */
+        button.capture-btn.updating {
+            background: var(--secondary-color);
+        }
+
         /* --- SCROLLABLE LIST AREA --- */
         #list-container {
             flex-grow: 1;
@@ -285,22 +291,27 @@
             color: var(--text-color);
         }
 
-        .glimmer-content { text-align: left; }
+        .glimmer-content { text-align: left; flex-grow: 1; padding-right: 10px; }
         .glimmer-text { display: block; font-size: 15px; margin-bottom: 4px; line-height: 1.4; }
         .timestamp { font-size: 11px; opacity: 0.6; }
         .tag-icon { margin-right: 6px; }
         
-        .delete-btn { 
+        .action-group { display: flex; gap: 5px; align-items: center; }
+
+        .list-btn { 
             background: transparent; 
-            color: var(--text-color); 
-            opacity: 0.3; 
-            font-size: 24px; 
             border: none; 
             cursor: pointer; 
-            padding: 0 0 0 15px;
-            height: 100%;
+            padding: 8px;
+            font-size: 18px;
+            opacity: 0.4;
+            transition: opacity 0.2s;
         }
-        .delete-btn:hover { color: var(--danger-color); opacity: 1; }
+        .list-btn:hover { opacity: 1; }
+        .edit-btn { color: var(--text-color); }
+        .edit-btn:hover { color: var(--edit-color); }
+        .delete-btn { color: var(--text-color); }
+        .delete-btn:hover { color: var(--danger-color); }
 
         .empty-state {
             margin-top: 50px;
@@ -449,6 +460,7 @@
                 emptyWarning: "Please type something...",
                 resetWarning: "Reset all your Glimmers and Streak?",
                 capture: "✨ Capture",
+                update: "🔄 Update",
                 emptyState: "No glimmers yet. Find one today!",
                 levelNames: ["Novice", "Spark Hunter", "Joy Collector", "Light Bringer", "Glimmer Master"],
                 tags: {
@@ -465,6 +477,7 @@
                     about: { title: "About", content: "Glimmer Hunter is a privacy-first tool. All data stays on your device.<br><br>Created by <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
                     how: { title: "How to Use", content: "1. <b>Spot it:</b> Look for small happy things.<br>2. <b>Tag it:</b> Tap a category (like Nature or Cozy).<br>3. <b>Capture it:</b> Type a note and save.<br><br>💡 Tap the lightbulb for ideas!" }
                 },
+                levelUp: { title: "Level Up!", msg: "You have reached a new level: " },
                 close: "Close"
             },
             es: {
@@ -472,6 +485,7 @@
                 emptyWarning: "Por favor escribe algo...",
                 resetWarning: "¿Reiniciar todo?",
                 capture: "✨ Capturar",
+                update: "🔄 Actualizar",
                 emptyState: "Aún no hay Glimmers. ¡Encuentra uno!",
                 levelNames: ["Novato", "Cazador", "Coleccionista", "Portador de Luz", "Maestro"],
                 tags: {
@@ -488,6 +502,7 @@
                     about: { title: "Acerca de", content: "Herramienta de privacidad total. Tus datos se quedan en tu dispositivo.<br><br>Creado por <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
                     how: { title: "Cómo usar", content: "1. <b>Busca:</b> Pequeñas cosas felices.<br>2. <b>Etiqueta:</b> Toca una categoría.<br>3. <b>Captura:</b> Escribe y guarda.<br><br>💡 ¡Toca la bombilla para ideas!" }
                 },
+                levelUp: { title: "¡Subiste de Nivel!", msg: "Has alcanzado un nuevo nivel: " },
                 close: "Cerrar"
             },
             no: {
@@ -495,6 +510,7 @@
                 emptyWarning: "Vennligst skriv noe...",
                 resetWarning: "Nullstille alle Glimmers og streak?",
                 capture: "✨ Lagre",
+                update: "🔄 Oppdater",
                 emptyState: "Ingen glimmers ennå. Finn en i dag!",
                 levelNames: ["Nybeynner", "Gnistjeger", "Gledes-samler", "Lysbringer", "Glimmer-mester"],
                 tags: {
@@ -511,6 +527,7 @@
                     about: { title: "Om", content: "Personvern først. Alle data lagres kun på din enhet.<br><br>Laget av <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
                     how: { title: "Hvordan bruke", content: "1. <b>Se det:</b> Se etter små, glade ting.<br>2. <b>Tagg det:</b> Trykk på en kategori (f.eks. Natur eller Kos).<br>3. <b>Lagre:</b> Skriv et notat og lagre.<br><br>💡 Trykk på lyspæren for ideer!" }
                 },
+                levelUp: { title: "Nivå opp!", msg: "Du har nådd et nytt nivå: " },
                 close: "Lukk"
             }
         };
@@ -533,6 +550,7 @@
         let currentLang = localStorage.getItem('glimmerLang') || 'en';
         let isDarkMode = localStorage.getItem('glimmerTheme') === 'dark';
         let currentTag = null; 
+        let editIndex = -1; // -1 means regular add mode
 
         // --- INIT ---
         if (isDarkMode) document.body.classList.add('dark-mode');
@@ -573,7 +591,15 @@
             
             // Standard Text Updates
             document.getElementById("glimmerInput").placeholder = t.placeholder;
-            document.getElementById("captureBtn").innerText = t.capture;
+            
+            // Check if we are in edit mode for the button text
+            const btn = document.getElementById("captureBtn");
+            if (editIndex > -1) {
+                btn.innerText = t.update;
+            } else {
+                btn.innerText = t.capture;
+            }
+
             document.getElementById("linkWhy").innerText = t.footer.why;
             document.getElementById("linkAbout").innerText = t.footer.about;
             document.getElementById("linkHow").innerText = t.footer.how;
@@ -605,14 +631,17 @@
             }
         }
 
-        function updateLevelDisplay() {
+        function getLevelName(c) {
             const levels = translations[currentLang].levelNames;
-            let levelName = levels[0];
-            if (count >= 10) levelName = levels[1];
-            if (count >= 50) levelName = levels[2];
-            if (count >= 100) levelName = levels[3];
-            if (count >= 500) levelName = levels[4];
-            document.getElementById("levelDisplay").innerText = levelName;
+            if (c >= 500) return levels[4];
+            if (c >= 100) return levels[3];
+            if (c >= 50) return levels[2];
+            if (c >= 10) return levels[1];
+            return levels[0];
+        }
+
+        function updateLevelDisplay() {
+            document.getElementById("levelDisplay").innerText = getLevelName(count);
         }
 
         function triggerSparkle() {
@@ -628,6 +657,30 @@
 
             if (text.trim() === "") { alert(translations[currentLang].emptyWarning); return; }
 
+            if (editIndex > -1) {
+                // --- UPDATE MODE ---
+                glimmerHistory[editIndex].text = text;
+                glimmerHistory[editIndex].tag = currentTag;
+                
+                // Reset Edit Mode
+                editIndex = -1;
+                const btn = document.getElementById("captureBtn");
+                btn.innerText = translations[currentLang].capture;
+                btn.classList.remove("updating");
+                
+                saveData();
+                renderHistory();
+                
+                // Clear input
+                inputField.value = "";
+                currentTag = null;
+                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                return;
+            }
+
+            // --- CREATE MODE ---
+            const prevLevel = getLevelName(count);
+
             const now = new Date();
             const todayStr = now.toISOString().split('T')[0];
             
@@ -637,6 +690,7 @@
             }
 
             count++;
+            const newLevel = getLevelName(count);
             
             glimmerHistory.unshift({ text: text, date: now.toISOString(), tag: currentTag });
             saveData();
@@ -644,17 +698,84 @@
             document.getElementById("counter").innerText = count;
             document.getElementById("streakCount").innerText = streak;
             updateLevelDisplay();
+            
             inputField.value = "";
             currentTag = null;
             document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
 
             renderHistory();
-            fireConfetti();
             triggerSparkle();
+
+            // Check for level up
+            if (prevLevel !== newLevel) {
+                triggerLevelUp(newLevel);
+            } else {
+                fireConfetti();
+            }
+        }
+
+        function editGlimmer(index) {
+            const item = glimmerHistory[index];
+            const inputField = document.getElementById("glimmerInput");
+            
+            // Populate input
+            inputField.value = item.text;
+            inputField.focus();
+            
+            // Set tag
+            currentTag = item.tag;
+            document.querySelectorAll('.chip').forEach(c => {
+                c.classList.remove('active');
+                if (c.getAttribute('data-tag') === currentTag) {
+                    c.classList.add('active');
+                }
+            });
+
+            // Set Edit Mode
+            editIndex = index;
+            const btn = document.getElementById("captureBtn");
+            btn.innerText = translations[currentLang].update;
+            btn.classList.add("updating");
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function fireConfetti() {
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#26A69A', '#FF7043', '#FFD700'] });
+        }
+
+        function triggerLevelUp(levelName) {
+            // Big confetti
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#FFD700', '#FF7043']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#26A69A', '#42A5F5']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+
+            // Show Modal
+            const t = translations[currentLang].levelUp;
+            document.getElementById("modalTitle").innerText = t.title;
+            document.getElementById("modalContent").innerHTML = `<p>${t.msg} <strong>${levelName}</strong>!</p><h1>🏆</h1>`;
+            document.getElementById("infoModal").style.display = "flex";
         }
 
         function inspireMe() {
@@ -695,14 +816,22 @@
         }
 
         function deleteGlimmer(index) {
-            // Translation for this specific alert is not in dict, keeping simple confirm
-            // Could add to dict but keeping simple for now.
             if(confirm("Remove this glimmer?")) {
                 glimmerHistory.splice(index, 1);
                 if(count > 0) count--;
                 saveData();
                 document.getElementById("counter").innerText = count;
                 updateLevelDisplay();
+                
+                // If we were editing this specific item, cancel edit mode
+                if (editIndex === index) {
+                    editIndex = -1;
+                    const btn = document.getElementById("captureBtn");
+                    btn.innerText = translations[currentLang].capture;
+                    btn.classList.remove("updating");
+                    document.getElementById("glimmerInput").value = "";
+                }
+                
                 renderHistory();
             }
         }
@@ -763,7 +892,10 @@
                         <span class="glimmer-text"><strong>${tagDisplay}</strong> ${item.text}</span>
                         <span class="timestamp">${displayTime}</span>
                     </div>
-                    <button class="delete-btn" onclick="deleteGlimmer(${index})">×</button>
+                    <div class="action-group">
+                        <button class="list-btn edit-btn" onclick="editGlimmer(${index})">✎</button>
+                        <button class="list-btn delete-btn" onclick="deleteGlimmer(${index})">×</button>
+                    </div>
                 `;
                 listElement.appendChild(li);
             });
