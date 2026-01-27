@@ -484,6 +484,15 @@
         #shareCard .share-date { opacity: 0.6; margin-top: 20px; font-size: 14px; font-weight: 600; }
         #shareCard .logo-mark { position: absolute; bottom: 20px; font-size: 12px; opacity: 0.5; letter-spacing: 1px; }
 
+        /* GAME OVERLAY */
+        #gameOverlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 200; backdrop-filter: blur(10px);
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        #gameCanvas { border: 2px solid var(--primary-color); border-radius: 20px; background: rgba(0,0,0,0.5); max-width: 95%; max-height: 80%; cursor: crosshair; }
+        #closeGameBtn { margin-top: 20px; background: white; color: black; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+
         @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
@@ -558,6 +567,12 @@
 
     <input type="file" id="fileInput" accept=".csv" onchange="processImport(this)">
 
+    <div id="gameOverlay">
+        <div style="color:white; margin-bottom:10px; font-weight:bold;">✨ Zen Mode: Pop the Glimmers ✨</div>
+        <canvas id="gameCanvas"></canvas>
+        <button id="closeGameBtn" onclick="closeGame()">Close Game</button>
+    </div>
+
     <script type="module">
         // --- FIREBASE IMPORTS ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -574,7 +589,7 @@
             appId: "1:986699142300:web:9f0e67a0dcda02aba54959"
         };
 
-        // --- TRANSLATIONS (Moved Up for Access) ---
+        // --- TRANSLATIONS ---
         const translations = {
             en: {
                 login: "Log in",
@@ -588,6 +603,16 @@
                 tags: { nature: "🌿 Nature", people: "👥 People", food: "🍕 Food", cozy: "☕ Cozy", win: "🏆 Win" },
                 prompts: ["Did you see a nice color today?", "Did you hear a good song?", "Did you enjoy a meal?", "Did you feel cozy somewhere?", "Did someone make you smile?", "Did you see nature today?", "Did you smell something nice?"],
                 footer: { why: "Why?", about: "About", how: "How to Use" },
+                menu: { 
+                    join: "Join Group", 
+                    lang: "Language", 
+                    theme: "Theme", 
+                    install: "Install App", 
+                    backup: "Backup Data", 
+                    restore: "Restore Data", 
+                    reset: "Reset App",
+                    game: "Play Zen Mode"
+                },
                 modals: {
                     why: { title: "Why Glimmer?", content: "Our brains are wired to notice danger. 'Glimmers' are the opposite: tiny moments of safety and joy. Spotting them reduces stress and reshapes your nervous system." },
                     about: { title: "About", content: "Glimmer Hunter is a privacy-first tool. <br><b>Notes stay on your device.</b><br>Only your score is synced to the cloud for the leaderboard.<br><br>Created by <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
@@ -608,6 +633,16 @@
                 tags: { nature: "🌿 Naturaleza", people: "👥 Gente", food: "🍕 Comida", cozy: "☕ Relax", win: "🏆 Logro" },
                 prompts: ["¿Viste un color bonito?", "¿Escuchaste una buena canción?", "¿Disfrutaste tu comida?", "¿Te sentiste cómodo?", "¿Alguien te hizo sonreír?", "¿Viste naturaleza?", "¿Oliste algo rico?"],
                 footer: { why: "Por qué", about: "Acerca de", how: "Cómo usar" },
+                menu: { 
+                    join: "Unirse a Grupo", 
+                    lang: "Idioma", 
+                    theme: "Tema", 
+                    install: "Instalar App", 
+                    backup: "Guardar Datos", 
+                    restore: "Cargar Datos", 
+                    reset: "Reiniciar App",
+                    game: "Jugar Modo Zen"
+                },
                 modals: {
                     why: { title: "¿Por qué Glimmer?", content: "Nuestros cerebros están programados para notar peligro. Los 'Glimmers' son lo opuesto: momentos de seguridad y alegría." },
                     about: { title: "Acerca de", content: "Herramienta de privacidad. <br><b>Tus notas se quedan en tu celular.</b><br>Solo tu puntaje se sube para el ranking.<br><br>Creado por <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
@@ -628,6 +663,16 @@
                 tags: { nature: "🌿 Natur", people: "👥 Folk", food: "🍕 Mat", cozy: "☕ Kos", win: "🏆 Seier" },
                 prompts: ["Så du en fin farge?", "Hørte du en bra sang?", "Smakte maten godt?", "Hadde du det koselig?", "Fikk noen deg til å smile?", "Så du noe fint i naturen?", "Luktet det godt?"],
                 footer: { why: "Hvorfor?", about: "Om", how: "Hvordan" },
+                menu: { 
+                    join: "Bli med i gruppe", 
+                    lang: "Språk", 
+                    theme: "Tema", 
+                    install: "Installer App", 
+                    backup: "Lagre Data", 
+                    restore: "Last Data", 
+                    reset: "Nullstill App",
+                    game: "Spill Zen-modus"
+                },
                 modals: {
                     why: { title: "Hvorfor Glimmer?", content: "Hjernen vår er laget for å oppdage fare. 'Glimmers' er det motsatte: små øyeblikk av trygghet og glede. Å legge merke til dem reduserer stress." },
                     about: { title: "Om", content: "Personvern først. <br><b>Notatene lagres på din enhet.</b><br>Kun poengsummen sendes til skyen for rangering.<br><br>Laget av <a href='https://instagram.com/mafer_cordovas' target='_blank'>@mafer_cordovas</a>" },
@@ -659,7 +704,6 @@
         document.getElementById("streakCount").innerText = streak;
         
         if(!translations[currentLang]) currentLang = 'en';
-        // Language update happens in window load below to ensure auth state is checked
         
         let app, auth, db, currentUser;
 
@@ -729,16 +773,18 @@
         window.openSettings = function() {
             const lang = currentLang.toUpperCase();
             const group = (localStorage.getItem('glimmerGroup') || 'Global').toUpperCase();
+            const t = translations[currentLang].menu;
             
             const html = `
                 <ul class="settings-list">
-                    <li onclick="openGroupSettings()"><span class="settings-icon">👥</span> Join Group <span>${group} ></span></li>
-                    <li onclick="toggleLanguage()"><span class="settings-icon">🌐</span> Language <span>${lang}</span></li>
-                    <li onclick="toggleTheme()"><span class="settings-icon">🌗</span> Theme <span>Toggle</span></li>
-                    <li onclick="openInstallGuide()"><span class="settings-icon">📲</span> Install App <span>></span></li>
-                    <li onclick="exportData()"><span class="settings-icon">💾</span> Backup (Save) <span>CSV</span></li>
-                    <li onclick="triggerImport()"><span class="settings-icon">📥</span> Restore (Load) <span>CSV</span></li>
-                    <li onclick="resetAll()" style="color:var(--danger-color)"><span class="settings-icon">♻️</span> Reset App <span></span></li>
+                    <li onclick="openGroupSettings()"><span class="settings-icon">👥</span> ${t.join} <span>${group} ></span></li>
+                    <li onclick="toggleLanguage()"><span class="settings-icon">🌐</span> ${t.lang} <span>${lang}</span></li>
+                    <li onclick="toggleTheme()"><span class="settings-icon">🌗</span> ${t.theme} <span>Toggle</span></li>
+                    <li onclick="startGame()"><span class="settings-icon">✨</span> ${t.game} <span>></span></li>
+                    <li onclick="openInstallGuide()"><span class="settings-icon">📲</span> ${t.install} <span>></span></li>
+                    <li onclick="exportData()"><span class="settings-icon">💾</span> ${t.backup} <span>CSV</span></li>
+                    <li onclick="triggerImport()"><span class="settings-icon">📥</span> ${t.restore} <span>CSV</span></li>
+                    <li onclick="resetAll()" style="color:var(--danger-color)"><span class="settings-icon">♻️</span> ${t.reset} <span></span></li>
                 </ul>
             `;
             document.getElementById("modalTitle").innerText = "Settings";
@@ -946,6 +992,96 @@
                 link.href = canvas.toDataURL();
                 link.click();
             });
+        }
+
+        // --- ZEN GAME LOGIC ---
+        let gameActive = false;
+        let gameParticles = [];
+        let canvas, ctx, animationId;
+
+        window.startGame = function() {
+            closeModal(); // Close settings
+            document.getElementById("gameOverlay").style.display = "flex";
+            canvas = document.getElementById("gameCanvas");
+            ctx = canvas.getContext("2d");
+            
+            // Resize canvas
+            canvas.width = window.innerWidth * 0.9;
+            canvas.height = window.innerHeight * 0.7;
+            
+            gameActive = true;
+            gameParticles = [];
+            
+            // Handle clicks
+            canvas.onclick = function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Check hits
+                for(let i=0; i<gameParticles.length; i++) {
+                    const p = gameParticles[i];
+                    const dist = Math.sqrt((x-p.x)**2 + (y-p.y)**2);
+                    if(dist < p.radius + 10) {
+                        // Pop!
+                        confetti({
+                             particleCount: 20,
+                             spread: 30,
+                             origin: { x: e.clientX/window.innerWidth, y: e.clientY/window.innerHeight },
+                             colors: [p.color]
+                        });
+                        gameParticles.splice(i, 1);
+                        break;
+                    }
+                }
+            };
+            
+            gameLoop();
+        }
+
+        window.closeGame = function() {
+            gameActive = false;
+            cancelAnimationFrame(animationId);
+            document.getElementById("gameOverlay").style.display = "none";
+        }
+
+        function gameLoop() {
+            if(!gameActive) return;
+            
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            
+            // Spawn new particle randomly
+            if(Math.random() < 0.03) {
+                gameParticles.push({
+                    x: Math.random() * canvas.width,
+                    y: canvas.height + 30,
+                    radius: 15 + Math.random() * 20,
+                    speed: 1 + Math.random() * 2,
+                    color: `hsl(${Math.random()*360}, 70%, 70%)`
+                });
+            }
+            
+            // Draw & Move
+            for(let i=0; i<gameParticles.length; i++) {
+                let p = gameParticles[i];
+                p.y -= p.speed;
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+                ctx.strokeStyle = "white";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Remove if off screen
+                if(p.y < -50) {
+                    gameParticles.splice(i, 1);
+                    i--;
+                }
+            }
+            
+            animationId = requestAnimationFrame(gameLoop);
         }
 
         // --- FUNCTIONS (Attached to Window) ---
